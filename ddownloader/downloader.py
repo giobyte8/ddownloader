@@ -24,7 +24,7 @@ class DownloadTask:
     downloaded_size: int = 0
     status: DownloadStatus = DownloadStatus.QUEUED
     file_hash: str = None
-    errorMessage: str = None
+    err_message: str = None
 
     def valid_for_download(self) -> bool:
         """Checks if download task is valid for be started or resumed
@@ -37,10 +37,10 @@ class DownloadTask:
             bool: True if download tasks state is valid and
                 download can proceeed 
         """
-        if dtask.status == DownloadStatus.IN_PROGRESS:
+        if self.status == DownloadStatus.IN_PROGRESS:
             raise DownloadAlreadyInProgressError()
         
-        elif dtask.status != DownloadStatus.QUEUED:
+        elif self.status != DownloadStatus.QUEUED:
             raise DownloadNotQueuedError()
 
         return True
@@ -148,28 +148,3 @@ def _make_request(dtask: DownloadTask):
         headers=headers,
         timeout=60 # seconds
     )
-
-
-
-def _refresh(dtask: DownloadTask):
-    dtask.status = DownloadStatus.IN_PROGRESS
-
-dtask = DownloadTask(
-    url="http://192.168.1.103:8082/Downloads/Cruella.2021.1080p-dual-cast-cine-calidad.com.mp4",
-    target_path="movie.mkv"
-)
-
-try:
-    download(
-        dtask,
-        lambda: print("{}: {} MB of {} MB".format(
-            dtask.status,
-            round(dtask.downloaded_size / 1024 / 1024),
-            round(dtask.total_size / 1024 / 1024)
-        )),
-        lambda: _refresh(dtask)
-    )
-except Exception as e:
-    print('Something went wrong: {}'.format(e))
-    dtask.status = DownloadStatus.FAILED
-    dtask.errorMessage = repr(e)
