@@ -55,3 +55,15 @@ def test_find_by_id(test_database):
     assert db_dtask.id == dtask.id
     assert db_dtask.url == dtask.url
     assert db_dtask.target_path == dtask.target_path
+
+
+def test_delete_by_id(test_database):
+    dtask = DownloadTask('fake_url.com', 'fake/target/path')
+    dtask_repo.save(dtask)
+
+    db_dtask = dtask_repo.find_by_id(dtask.id)
+    assert db_dtask is not None
+
+    dtask_repo.delete_by_id(dtask.id)
+    db_dtask = dtask_repo.find_by_id(dtask.id)
+    assert db_dtask is None

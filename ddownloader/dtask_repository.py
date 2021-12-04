@@ -46,6 +46,11 @@ UPDATE_DTASK = """
     WHERE id = :id
 """
 
+DELETE_DTASK = """
+    DELETE from download_task
+    WHERE id = :id
+"""
+
 _db_path = dconfig.get_db_path()
 
 
@@ -132,7 +137,8 @@ def find_by_id(id: int) -> DownloadTask:
         return dtask
 
 def delete_by_id(id: int):
-    pass
+    with _db_con() as con:
+        con.execute(DELETE_DTASK, {'id': id})
 
 
 ## Initialize database upon module first execution
