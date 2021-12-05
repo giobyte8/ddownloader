@@ -1,7 +1,10 @@
 import contextlib
 import sqlite3
 import ddownloader.config_loader as dconfig
-from ddownloader.downloader import DownloadTask
+from ddownloader.downloader import (
+    DownloadStatus,
+    DownloadTask
+)
 from ddownloader.log_utils import logger
 
 
@@ -49,6 +52,18 @@ UPDATE_DTASK = """
 DELETE_DTASK = """
     DELETE from download_task
     WHERE id = :id
+"""
+
+FIND_ALL_LIMIT = """
+    SELECT * FROM download_task
+    ORDER BY id ASC
+    LIMIT :limit
+"""
+
+FIND_ALL_LIMIT_OFFSET = """
+    SELECT * FROM download_task
+    ORDER BY id ASC
+    LIMIT :limit OFFSET :offset
 """
 
 _db_path = dconfig.get_db_path()
@@ -117,8 +132,21 @@ def save(dtask: DownloadTask):
 
             dtask.id = cur.lastrowid
 
-def paginate(page_size: int = 30, page: int = 0):
-    pass
+def paginate(page_size: int = 30, page: int = 1) -> list[DownloadTask]:
+    with _db_con() as con:
+        if page <= 1:
+            cur = con.execute(FIND_ALL_LIMIT, {
+                'limit': page_size
+            })
+        else:
+            cur = con.execute(FIND_ALL_LIMIT_OFFSET, {
+                'limit': page_size,
+                'offset': page_size * (page - 1)
+            })
+
+        rows = cur.fetchall()
+        return list(map(_map_row_to_dtask, rows))
+
 
 def find_by_id(id: int) -> DownloadTask:
     with _db_con() as con:
@@ -128,17 +156,31 @@ def find_by_id(id: int) -> DownloadTask:
         if not row:
             return None
 
-        dtask = DownloadTask(row['url'], row['target_path'])
-        dtask.id = row['id']
-        dtask.total_size = row['total_size']
-        dtask.downloaded_size = row['downloaded_size']
-        dtask.file_hash = row['file_hash']
-        dtask.err_message = row['err_message']
-        return dtask
+        return _map_row_to_dtask(row)
 
 def delete_by_id(id: int):
     with _db_con() as con:
         con.execute(DELETE_DTASK, {'id': id})
+
+def _map_row_to_dtask(row: sqlite3.Row) -> DownloadTask:
+    """Maps a database sqlite3 Row instance into an
+    instance of DownloadTask
+
+    Args:
+        row (sqlite3.Row): Query result row
+
+    Returns:
+        DownloadTask: Mapped download tasks
+    """
+    dtask = DownloadTask(row['url'], row['target_path'])
+    dtask.id = row['id']
+    dtask.total_size = row['total_size']
+    dtask.downloaded_size = row['downloaded_size']
+    dtask.status = DownloadStatus(row['status'])
+    dtask.file_hash = row['file_hash']
+    dtask.err_message = row['err_message']
+
+    return dtask
 
 
 ## Initialize database upon module first execution
