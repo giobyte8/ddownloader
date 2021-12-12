@@ -3,7 +3,10 @@ from flask_inputs import Inputs
 from flask_inputs.validators import JsonSchema
 from ddownloader.downloader import DownloadTask
 
-from ddownloader.web.validators import safe_target_path
+from ddownloader.web.validators import (
+    safe_target_path,
+    target_path_not_exists
+)
 
 
 dtask_schema = {
@@ -25,7 +28,11 @@ dtask_schema = {
 }
 
 class PostDownloadTaskRequest(Inputs):
-    json = [JsonSchema(schema=dtask_schema), safe_target_path]
+    json = [
+        JsonSchema(schema=dtask_schema),
+        safe_target_path,
+        target_path_not_exists
+    ]
 
 @dataclass
 class DownloadTasksPage():
