@@ -121,7 +121,7 @@ def save(dtask: DownloadTask):
                 "total_size": dtask.total_size,
                 "downloaded_size": dtask.downloaded_size,
                 "status": dtask.status.value,
-                "err_message": dtask.error_message,
+                "err_message": dtask.err_message,
                 "id": dtask.id
             })
         else:

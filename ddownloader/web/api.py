@@ -1,14 +1,10 @@
 from flask import request
 from flask.json import jsonify
-from ddownloader.downloader import DownloadTask
 
-import ddownloader.dtask_repository as dtask_repo
+from ddownloader.web import dtask_service
 from ddownloader.web.app import app
 from ddownloader.web.errors import DTaskValidationError
-from ddownloader.web.models import (
-    DownloadTasksPage,
-    PostDownloadTaskRequest
-)
+from ddownloader.web.models import PostDownloadTaskRequest
 
 
 @app.errorhandler(DTaskValidationError)
@@ -23,15 +19,7 @@ def get_tasks():
     page = request.args.get('page', 1)
     page_size = request.args.get('page_size', 30)
 
-    dtasks = dtask_repo.paginate(page_size, page)
-    count = dtask_repo.count()
-
-    dtasks_page = DownloadTasksPage(
-        page,
-        page_size,
-        count,
-        dtasks
-    )
+    dtasks_page = dtask_service.get_page(page, page_size)
     return jsonify(dtasks_page.to_dict())
 
 
@@ -41,11 +29,12 @@ def post_task():
     if not inputs.validate():
         raise DTaskValidationError(inputs.errors[0])
 
-    dtask = DownloadTask(
+    dtask = dtask_service.create_and_queue(
         url=request.json.get('url'),
-        target_path=request.json.get('target_path'),
+        relative_target_path=request
+            .json
+            .get('relative_target_path'),
         file_hash=request.json.get('file_hash', None)
     )
-
-    dtask_repo.save(dtask)
+    
     return jsonify(dtask.to_dict())

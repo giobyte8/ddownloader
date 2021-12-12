@@ -3,11 +3,11 @@ from pathvalidate import is_valid_filepath
 
 
 def safe_target_path(form, field):
-    """Validates that value of target_path is a valid
+    """Validates that value of relative_target_path is a valid
     local file URL, and that it does not contains '..'
     """
 
-    TARGET_PATH_FN = 'target_path'
+    TARGET_PATH_FN = 'relative_target_path'
     target_path: str = field.data.get(TARGET_PATH_FN, '')
 
     if not is_valid_filepath(target_path):

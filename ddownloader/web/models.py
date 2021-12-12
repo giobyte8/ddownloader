@@ -8,14 +8,14 @@ from ddownloader.web.validators import safe_target_path
 
 dtask_schema = {
     'type': 'object',
-    'required': ['url', 'target_path'],
+    'required': ['url', 'relative_target_path'],
     'properties': {
         'url': {
             'type': 'string',
             'format': 'uri',
             'pattern': '^(https?|http)://'
         },
-        'target_path': {
+        'relative_target_path': {
             'type': 'string'
         },
         'file_hash': {
