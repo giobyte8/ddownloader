@@ -141,3 +141,6 @@ cython_debug/
 
 # VSCode
 .vscode
+
+# Development database
+ddownloader.db

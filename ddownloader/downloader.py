@@ -26,6 +26,18 @@ class DownloadTask:
     file_hash: str = None
     err_message: str = None
 
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'url': self.url,
+            'target_path': self.target_path,
+            'total_size': self.total_size,
+            'downloaded_size': self.downloaded_size,
+            'status': self.status.value,
+            'file_hash': self.file_hash,
+            'err_message': self.err_message
+        }
+
     def valid_for_download(self) -> bool:
         """Checks if download task is valid for be started or resumed
 
@@ -148,3 +160,26 @@ def _make_request(dtask: DownloadTask):
         headers=headers,
         timeout=60 # seconds
     )
+
+# def _refresh(dtask: DownloadTask):
+#     dtask.status = DownloadStatus.IN_PROGRESS
+
+# dtask = DownloadTask(
+#     url="http://192.168.1.103:8082/Downloads/Cruella.2021.1080p-dual-cast-cine-calidad.com.mp4",
+#     target_path="movie.mkv"
+# )
+
+# try:
+#     download(
+#         dtask,
+#         lambda: print("{}: {} MB of {} MB".format(
+#             dtask.status,
+#             round(dtask.downloaded_size / 1024 / 1024),
+#             round(dtask.total_size / 1024 / 1024)
+#         )),
+#         lambda: _refresh(dtask)
+#     )
+# except Exception as e:
+#     print('Something went wrong: {}'.format(e))
+#     dtask.status = DownloadStatus.FAILED
+#     dtask.errorMessage = repr(e)

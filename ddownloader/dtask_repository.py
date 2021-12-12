@@ -66,6 +66,10 @@ FIND_ALL_LIMIT_OFFSET = """
     LIMIT :limit OFFSET :offset
 """
 
+COUNT = """
+    SELECT COUNT(*) as total_count FROM download_task
+"""
+
 _db_path = dconfig.get_db_path()
 
 
@@ -147,6 +151,12 @@ def paginate(page_size: int = 30, page: int = 1) -> list[DownloadTask]:
         rows = cur.fetchall()
         return list(map(_map_row_to_dtask, rows))
 
+def count() -> int:
+    with _db_con() as conn:
+        cur = conn.execute(COUNT)
+        row = cur.fetchone()
+
+        return row['total_count']
 
 def find_by_id(id: int) -> DownloadTask:
     with _db_con() as con:
