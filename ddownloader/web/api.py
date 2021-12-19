@@ -38,3 +38,9 @@ def post_task():
     )
     
     return jsonify(dtask.to_dict())
+
+
+@app.route('/tasks/<int:id>', methods=['DELETE'])
+def delete_task(id):
+    dtask_service.remove(id)
+    return '', 204

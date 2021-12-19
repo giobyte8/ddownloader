@@ -54,3 +54,5 @@ def get_page(page: int, page_size: int) -> DownloadTasksPage:
         dtasks
     )
 
+def remove(task_id: int) -> None:
+    dtask_repo.delete_by_id(task_id)
