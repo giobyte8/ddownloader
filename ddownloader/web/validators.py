@@ -2,6 +2,7 @@ from flask_inputs.validators import ValidationError
 from pathlib import Path
 from pathvalidate import is_valid_filepath
 
+import ddownloader.dtask_repository as dtask_repo
 from ddownloader.config_loader import downloads_dir
 
 
@@ -29,3 +30,12 @@ def target_path_not_exists(form, field):
     dest_file = Path(downloads_dir(), target_path)
     if dest_file.exists():
         raise ValidationError(f'Given {TARGET_PATH_FN} already exists')
+
+def dtask_exists(form, field):
+    """Validates that given download task exists
+    """
+    dtask = dtask_repo.find_by_id(field.data)
+    if not dtask:
+        raise ValidationError(
+            f"Download task with id '{field.data}' was not found"
+        )

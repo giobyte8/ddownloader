@@ -3,7 +3,8 @@ from pathlib import PurePath
 import ddownloader.dtask_repository as dtask_repo
 from ddownloader import async_tasks
 from ddownloader.config_loader import downloads_dir
-from ddownloader.downloader import DownloadTask
+from ddownloader.downloader import DownloadStatus, DownloadTask
+from ddownloader.errors import InvalidStatusTransitionError
 from ddownloader.web.models import DownloadTasksPage
 
 
@@ -53,6 +54,23 @@ def get_page(page: int, page_size: int) -> DownloadTasksPage:
         count,
         dtasks
     )
+
+def update_status(dtask_id: int, to_status: DownloadStatus) -> DownloadTask:
+    dtask = dtask_repo.find_by_id(dtask_id)
+    
+    if dtask.status in [DownloadStatus.QUEUED, DownloadStatus.IN_PROGRESS]:
+        if to_status != DownloadStatus.PAUSED:
+            raise InvalidStatusTransitionError(dtask.status, to_status)
+    
+    elif dtask.status in [DownloadStatus.PAUSED, DownloadStatus.FAILED]:
+        if to_status != DownloadStatus.QUEUED:
+            raise InvalidStatusTransitionError(dtask.status, to_status)
+
+    
+    # Exception was not raised, update dtask
+    dtask.status = to_status
+    dtask_repo.save(dtask)
+    return dtask
 
 def remove(task_id: int) -> None:
     dtask_repo.delete_by_id(task_id)

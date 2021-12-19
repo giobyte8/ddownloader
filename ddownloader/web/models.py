@@ -4,6 +4,7 @@ from flask_inputs.validators import JsonSchema
 from ddownloader.downloader import DownloadTask
 
 from ddownloader.web.validators import (
+    dtask_exists,
     safe_target_path,
     target_path_not_exists
 )
@@ -27,12 +28,33 @@ dtask_schema = {
     }
 }
 
+dtask_update_schema = {
+    'type': 'object',
+    'required': ['status'],
+    'properties': {
+        'status': {
+            'type': 'string',
+            'enum': [
+                'Queued',
+                'Paused'
+            ]
+        }
+    }
+}
+
 class PostDownloadTaskRequest(Inputs):
     json = [
         JsonSchema(schema=dtask_schema),
         safe_target_path,
         target_path_not_exists
     ]
+
+class PutDownloadTaskRequest(Inputs):
+    json = [JsonSchema(schema=dtask_update_schema)]
+    rule = {
+        'dtask_id': [dtask_exists]
+    }
+
 
 @dataclass
 class DownloadTasksPage():
