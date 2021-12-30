@@ -142,5 +142,8 @@ cython_debug/
 # VSCode
 .vscode
 
-# Development database
+# Development databases
 ddownloader.db
+huey.db
+huey.db-shm
+huey.db-wal
