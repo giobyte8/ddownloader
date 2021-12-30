@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDownloader</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+</head>
+<body>
+    <nav class="navbar is-light">
+        <div class="container">
+            <div class="navbar-menu">
+                <div class="navbar-start">
+                    <a href="#" class="navbar-item">Play</a>
+                    <a href="#" class="navbar-item">Add</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <section class="section">
+        <div class="container">
+            
+            <div class="card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48">
+                                <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-5">MovieOrSong.mp4</p>
+                            <p class="subtitle is-6">25MB of 1.6GB (0.1%)</p>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <progress class="progress is-small" value="15" max="100">15%</progress>
+                    </div>
+                </div>
+
+                <footer class="card-footer">
+                    <a href="#" class="card-footer-item has-text-danger">Abort</a>
+                    <a href="#" class="card-footer-item">Pause</a>
+                    <a href="#" class="card-footer-item">Details</a>
+                </footer>
+            </div>
+
+            <br>
+            <div class="card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48">
+                                <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-5">MovieOrSong.mp4</p>
+                            <p class="subtitle is-6">
+                                <span class="tag is-warning">Paused</span>
+                                <!-- <span>25MB of 1.6GB (0.1%)</span> -->
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <progress class="progress is-small" value="15" max="100">15%</progress>
+                    </div>
+                </div>
+
+                <footer class="card-footer">
+                    <a href="#" class="card-footer-item has-text-danger">Abort</a>
+                    <a href="#" class="card-footer-item">Resume</a>
+                    <a href="#" class="card-footer-item">Details</a>
+                </footer>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
