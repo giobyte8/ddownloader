@@ -1,4 +1,5 @@
 Flask==2.0.2
+Flask-Cors==3.0.10
 Flask-Inputs==0.3.0
 huey==2.4.1
 jsonschema==4.2.1
