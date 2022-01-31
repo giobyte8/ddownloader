@@ -8,7 +8,7 @@ from ddownloader import downloader
 
 
 _db_path = get_db_path()
-logger.info(f'Huey database: {_db_path}')
+logger.info('Huey database: %s', _db_path)
 huey = SqliteHuey(_db_path)
 
 
