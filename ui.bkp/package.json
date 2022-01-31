@@ -1,0 +1,14 @@
+{
+  "name": "ddownloader-ui",
+  "version": "1.0.0",
+  "description": "DDownloader web UI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Giovanni Aguirre",
+  "license": "ISC",
+  "dependencies": {
+    "bulma": "^0.9.3"
+  }
+}
