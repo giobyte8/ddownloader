@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from flask_inputs import Inputs
 from flask_inputs.validators import JsonSchema
+from wtforms.validators import DataRequired, URL, Regexp
 from ddownloader.downloader import DownloadTask
 
 from ddownloader.web.validators import (
@@ -53,6 +54,11 @@ class PutDownloadTaskRequest(Inputs):
     json = [JsonSchema(schema=dtask_update_schema)]
     rule = {
         'dtask_id': [dtask_exists]
+    }
+
+class UrlMetadataRequest(Inputs):
+    args = {
+        'url': [DataRequired(), URL(), Regexp('^(https?|http)://')]
     }
 
 

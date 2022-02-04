@@ -1,9 +1,10 @@
-import os
-import requests
-
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable
+
+import os
+import uuid
+import requests
 
 
 class DownloadStatus(Enum):
@@ -73,6 +74,77 @@ class DownloadAlreadyInProgressError(Exception):
     def __init__(self) -> None:
         super().__init__("Download is already in progress")
 
+@dataclass
+class UrlMetadata:
+    url: str
+    content_disposition: str = ''
+    content_length: int = 0
+    content_type: str = ''
+    server: str = ''
+    proposed_file_name: str = ''
+
+    def to_dict(self) -> dict:
+        return {
+            'url': self.url,
+            'content_disposition': self.content_disposition,
+            'content_length': self.content_length,
+            'content_type': self.content_type,
+            'server': self.server,
+            'proposed_file_name': self.proposed_file_name
+        }
+
+    def compute_file_name(self) -> str:
+        filename = ''
+
+        if self.content_disposition:
+            parts = self.content_disposition.split(';')
+            for part in parts:
+                if part.startswith('filename='):
+                    filename = part                  \
+                        .replace('filename=', '', 1) \
+                        .strip("\"")
+
+        if not filename:
+            filename = os.path.basename(self.url)
+
+        if not filename:
+            filename = str(uuid.uuid4())
+
+        if not '.' in filename:
+            if self.content_type == 'image/jpeg':
+                filename += '.jpeg'
+
+            if self.content_type == 'image/jpg':
+                filename += '.jpg'
+
+            if self.content_type == 'image/png':
+                filename += '.png'
+
+        self.proposed_file_name = filename
+
+
+def metadata(url: str) -> UrlMetadata:
+    res = requests.head(url, timeout=5, allow_redirects=True)
+    res.raise_for_status()
+    # TODO Catch request errors gracefully
+
+    url_meta = UrlMetadata(url)
+
+    if 'Content-Disposition' in res.headers:
+        url_meta.content_disposition = res.headers['Content-Disposition']
+
+    if 'Content-Length' in res.headers:
+        url_meta.content_length = res.headers['Content-Length']
+
+    if 'Content-Type' in res.headers:
+        url_meta.content_type = res.headers['Content-Type']
+
+    if 'Server' in res.headers:
+        url_meta.server = res.headers['Server']
+
+    url_meta.compute_file_name()
+    return url_meta
+
 
 def download(
     dtask: DownloadTask,
@@ -113,10 +185,10 @@ def download(
                 for chunk in res.iter_content(chunk_size=chunk_size):
 
                     # Ensure chunk is not empty
-                    if (chunk):
+                    if chunk:
                         target.write(chunk)
                         dtask.downloaded_size += len(chunk)
-                
+
                     # Reload external status before update downloaded size
                     # to avoid override possible external changes
                     reload_status()
@@ -148,7 +220,7 @@ def _make_request(dtask: DownloadTask):
     starting_byte = 0
     if os.path.exists(dtask.target_path):
         starting_byte = os.path.getsize(dtask.target_path)
-    
+
     # Skip previously downloaded bytes when applicable.
     # e.g. like when resuming download
     range_header = {'Range': f'bytes={starting_byte}-'}

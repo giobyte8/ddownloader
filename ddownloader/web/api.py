@@ -1,19 +1,25 @@
 from flask import request
 from flask.json import jsonify
+from ddownloader import downloader
 from ddownloader.downloader import DownloadStatus
 
 from ddownloader.errors import InvalidStatusTransitionError
 from ddownloader.web import dtask_service
 from ddownloader.web.app import app
-from ddownloader.web.errors import DTaskValidationError
+from ddownloader.web.errors import (
+    DDownloaderApiError,
+    DTaskValidationError,
+    UrlMetadataRequestValidationError
+)
 from ddownloader.web.models import (
     PostDownloadTaskRequest,
-    PutDownloadTaskRequest
+    PutDownloadTaskRequest,
+    UrlMetadataRequest
 )
 
 
-@app.errorhandler(DTaskValidationError)
-def on_dtask_validation_error(err: DTaskValidationError):
+@app.errorhandler(DDownloaderApiError)
+def on_dtask_validation_error(err: DDownloaderApiError):
     res = jsonify(err.to_dict())
     res.status_code = err.status_code
     return res
@@ -50,7 +56,7 @@ def post_task():
             .get('relative_target_path'),
         file_hash=request.json.get('file_hash', None)
     )
-    
+
     return jsonify(dtask.to_dict())
 
 
@@ -63,7 +69,7 @@ def put_task(dtask_id):
     new_status_raw = request.json.get('status')
     new_status = DownloadStatus(new_status_raw)
     dtask = dtask_service.update_status(dtask_id, new_status)
-    
+
     return jsonify(dtask.to_dict())
 
 
@@ -71,3 +77,12 @@ def put_task(dtask_id):
 def delete_task(id):
     dtask_service.remove(id)
     return '', 204
+
+@app.route('/url/metadata', methods=['GET'])
+def fetch_metadata():
+    inputs = UrlMetadataRequest(request)
+    if not inputs.validate():
+        raise UrlMetadataRequestValidationError(inputs.errors[0])
+
+    url_meta = downloader.metadata(request.args.get('url'))
+    return jsonify(url_meta.to_dict())
