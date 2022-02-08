@@ -1,10 +1,12 @@
+import os
+import uuid
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable
 
-import os
-import uuid
 import requests
+from requests.exceptions import RequestException
+from ddownloader.errors import MetadataReqError
 
 
 class DownloadStatus(Enum):
@@ -48,11 +50,11 @@ class DownloadTask:
 
         Returns:
             bool: True if download tasks state is valid and
-                download can proceeed 
+                download can proceeed
         """
         if self.status == DownloadStatus.IN_PROGRESS:
             raise DownloadAlreadyInProgressError()
-        
+
         elif self.status != DownloadStatus.QUEUED:
             raise DownloadNotQueuedError()
 
@@ -124,9 +126,11 @@ class UrlMetadata:
 
 
 def metadata(url: str) -> UrlMetadata:
-    res = requests.head(url, timeout=5, allow_redirects=True)
-    res.raise_for_status()
-    # TODO Catch request errors gracefully
+    try:
+        res = requests.head(url, timeout=5, allow_redirects=True)
+        res.raise_for_status()
+    except RequestException as err:
+        raise MetadataReqError(str(err)) from err
 
     url_meta = UrlMetadata(url)
 
@@ -209,7 +213,7 @@ def download(
 def _make_request(dtask: DownloadTask):
     """Constructs download request for given task.
     If target path already exists, request will fetch only remaining
-    bytes using the 'Range' header 
+    bytes using the 'Range' header
 
     Args:
         dtask (DownloadTask): Download job to execute

@@ -3,7 +3,10 @@ from flask.json import jsonify
 from ddownloader import downloader
 from ddownloader.downloader import DownloadStatus
 
-from ddownloader.errors import InvalidStatusTransitionError
+from ddownloader.errors import (
+    InvalidStatusTransitionError,
+    MetadataReqError
+)
 from ddownloader.web import dtask_service
 from ddownloader.web.app import app
 from ddownloader.web.errors import (
@@ -22,6 +25,12 @@ from ddownloader.web.models import (
 def on_dtask_validation_error(err: DDownloaderApiError):
     res = jsonify(err.to_dict())
     res.status_code = err.status_code
+    return res
+
+@app.errorhandler(MetadataReqError)
+def on_metadata_req_error(err: MetadataReqError):
+    res = jsonify({ 'message': err.message })
+    res.status_code = 500
     return res
 
 @app.errorhandler(InvalidStatusTransitionError)

@@ -1,6 +1,12 @@
 from unittest.mock import patch
-from ddownloader.downloader import UrlMetadata
+import pytest
+import requests
 
+from ddownloader import downloader
+from ddownloader.downloader import UrlMetadata
+from ddownloader.errors import MetadataReqError
+
+# pylint: disable=R0201
 class TestUrlMetadata:
     test_url = 'http://random.com/somefile.png'
     test_url_no_extension = 'http://random.com/somefile'
@@ -49,3 +55,35 @@ class TestUrlMetadata:
 
         meta.compute_file_name()
         assert 'somefile.png' == meta.proposed_file_name
+
+
+# pylint: disable=R0201
+class TestMetadataReq:
+
+    @patch('ddownloader.downloader.requests.head')
+    def test_conn_error(self, mock_head):
+        mock_head.side_effect = requests.exceptions.ConnectionError
+
+        with pytest.raises(MetadataReqError):
+            downloader.metadata('testurl.com')
+
+    @patch('ddownloader.downloader.requests.head')
+    def test_timeout_error(self, mock_head):
+        mock_head.side_effect = requests.exceptions.Timeout
+
+        with pytest.raises(MetadataReqError):
+            downloader.metadata('testurl.com')
+
+    @patch('ddownloader.downloader.requests.head')
+    def test_too_many_redirects_error(self, mock_head):
+        mock_head.side_effect = requests.exceptions.TooManyRedirects
+
+        with pytest.raises(MetadataReqError):
+            downloader.metadata('testurl.com')
+
+    @patch('ddownloader.downloader.requests.head')
+    def test_http_error(self, mock_head):
+        mock_head.side_effect = requests.exceptions.HTTPError
+
+        with pytest.raises(MetadataReqError):
+            downloader.metadata('testurl.com')
