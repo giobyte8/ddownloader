@@ -1,27 +1,15 @@
 import { useState } from 'preact/hooks'
+import { isValidHttpUrl } from '../../services/validator.service'
 
 
 const urlError = 'Url seems to be invalid or unreachable'
-
-const isUrlValid = (urlStr) => {
-    let url;
-
-    try {
-        url = new URL(urlStr)
-    } catch ( _ ) {
-        return false
-    }
-
-    // Probably protocol should not be validated (?)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-}
 
 const DTaskUrlForm = ({ url, setUrl, setFormStep }) => {
     const [urlValid, setUrlValid] = useState(true)
     
     const onBackClicked = () => console.log('Going back to main route')
     const onNextClicked = () => {
-        if (isUrlValid(url)) {
+        if (isValidHttpUrl(url)) {
             setUrlValid(true)
             setFormStep(2)
         } else {
