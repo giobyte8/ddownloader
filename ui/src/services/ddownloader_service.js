@@ -1,6 +1,6 @@
 import { isValidHttpUrl } from "./validator.service"
 
-const baseUrl = 'http://192.168.1.106:5000'
+const baseUrl = 'http://192.168.1.110:5000'
 
 
 export async function fetchTasks() {

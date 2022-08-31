@@ -11,6 +11,38 @@ const isFileNameValid = (fileName) => {
     return false
 }
 
+const filePreview = (urlMeta) => {
+
+    // Do not render preview for files greater than 10MB
+    if (urlMeta.content_length > 10 * 1024 * 1024) {
+        return ''
+    }
+
+    const supportedContentTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/jpege',
+        'image/png'
+    ]
+
+    if (!supportedContentTypes.includes(urlMeta.content_type)) {
+        return ''
+    }
+
+    return <div className="column is-12 has-text-centered">
+        <img
+            src={ urlMeta.url }
+            alt="Image preview"
+            style="
+                height: 100%;
+                max-height: 200px;
+                width: 150px;
+                object-fit: contain;
+            "
+        />
+    </div>
+}
+
 const LoadingWrapper = () => <div className="card-content">
     <Loading/>
 </div>
@@ -44,9 +76,8 @@ const DTaskFileNameForm = ({ url, fileName, setFileName, setFormStep }) => {
     return <>
         <div className="card-content">
             <div className="columns is-multiline">
-                <div className="column is-12">
-                    image
-                </div>
+                { filePreview(urlMeta) }
+
                 <div className="column is-6">
                     <span className="subtitle is-6">File size</span>
                     <br />
