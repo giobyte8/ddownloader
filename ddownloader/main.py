@@ -14,6 +14,7 @@ if not __package__ and not hasattr(sys, "frozen"):
 
 from ddownloader.dao import http_gallery_source_dao as gallery_src_dao
 from ddownloader.download import download_svc
+from ddownloader.dao import database
 from ddownloader.web.app import app as downloader_app
 
 
@@ -22,9 +23,9 @@ __bg_tasks = set()
 
 @downloader_app.before_serving
 async def before_serving():
-    gl_sources = await gallery_src_dao.all()
+    await database.init()
 
-    dl_task = asyncio.create_task(download_svc.start(gl_sources))
+    dl_task = asyncio.create_task(download_svc.start())
     __bg_tasks.add(dl_task)
 
 
