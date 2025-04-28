@@ -1,0 +1,41 @@
+{
+    "extractor": {
+        "postprocessors": [
+            {
+                "name": "exec",
+                "async": false,
+                "command": "Replaced at runtime",
+                "event": "after"
+            },
+            {
+                "name": "exec",
+                "async": false,
+                "command": "Replaced at runtime",
+                "event": "skip"
+            }
+        ],
+
+        "500px": {
+            "gallery": {
+                "filename": "500px_{id}.{extension}"
+            },
+            "image": {
+                "filename": "500px_{id}.{extension}"
+            }
+        },
+
+        "pinterest": {
+            "videos": false,
+            "cookies": {
+                "_pinterest_sess": "<Replace with your own value>"
+            }
+        },
+
+        "instagram": {
+            "cookies": {
+                "sessionid": "<Replace with your own value>"
+            }
+        }
+    }
+
+}

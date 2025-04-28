@@ -1,5 +1,5 @@
+import datetime
 import logging
-
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from ddownloader.models import HttpGallerySource
 from .base import Scheduler
@@ -24,11 +24,16 @@ class AIOGalleryDlScheduler(Scheduler):
         if not isinstance(src, HttpGallerySource):
             raise TypeError("src must be an instance of HttpGallerySource")
 
+        # TODO Tune up parameters below to ensure sequential download of sources
+        # Next run = now + 1 second
+        next_run = datetime.datetime.now() + datetime.timedelta(seconds=1)
         self._scheduler.add_job(
             func=gl_downloader.download,
             args=[src],
-            trigger='interval', # TODO: Update to every night
-            seconds=5 # TODO: make this configurable
+            trigger='interval',     # TODO: Update to every night
+            seconds=30,             # TODO: make this configurable
+            misfire_grace_time=60,
+            #next_run_time=next_run
         )
 
     async def start(self):

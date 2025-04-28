@@ -1,4 +1,5 @@
 .testData
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -147,3 +148,6 @@ ddownloader.db
 huey.db
 huey.db-shm
 huey.db-wal
+
+# Development data
+data/

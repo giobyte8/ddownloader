@@ -19,5 +19,18 @@ def db_user():
 def db_password():
     return os.getenv("DB_PASSWORD")
 
+
 def db_name():
     return os.getenv("DB_NAME")
+
+
+def galleries_path():
+    return os.getenv("GALLERIES_PATH")
+
+
+def config_path():
+    return os.getenv("CONFIG_PATH", "config")
+
+
+def runtime_path():
+    return os.path.join(config_path(), "runtime")
