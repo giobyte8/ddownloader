@@ -12,7 +12,7 @@ if not __package__ and not hasattr(sys, "frozen"):
     )
     sys.path.insert(0, os.path.realpath(central_root))
 
-from ddownloader.dao import http_gallery_source_dao as gallery_src_dao
+import ddownloader.config as cfg
 from ddownloader.download import download_svc
 from ddownloader.dao import database
 from ddownloader.web.app import app as downloader_app
@@ -36,4 +36,6 @@ async def shutdown():
 
 
 if __name__ == "__main__":
-    downloader_app.run(host='0.0.0.0', port=5001)
+    downloader_app.run(
+        host='0.0.0.0',
+        port=cfg.app_port())

@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def app_port():
+    return os.getenv("APP_PORT")
+
+
 def db_host():
     return os.getenv("DB_HOST")
 
