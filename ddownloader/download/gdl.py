@@ -1,8 +1,8 @@
+import asyncio
 import json
 import logging
 import uuid
 import os
-import subprocess
 import ddownloader.config as cfg
 from ddownloader import futils
 from ddownloader.models import HttpGallerySource
@@ -30,13 +30,17 @@ async def download(src: HttpGallerySource) -> None:
         .build()
 
     # REMOVE -q param for more verbose output from gallery-dl subprocess
-    p = subprocess.run([
+    gdl_proc = await asyncio.create_subprocess_exec(
         'gallery-dl',
         '-q',
         '-D', gl_content_path,
         '-c', gdl_cfg_file_path,
         str(src.url)
-    ])
+    )
+
+    await gdl_proc.wait()
+    if gdl_proc.returncode != 0:
+        logging.error(f"gallery-dl process failed with return code {gdl_proc.returncode}")
 
     # Comment remove file step for debugging purposes
     os.remove(gdl_cfg_file_path)
