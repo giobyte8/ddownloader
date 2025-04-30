@@ -12,7 +12,6 @@ async def start():
 
     sources = await src_dao.all()
     for src in sources:
-        logger.debug(f"Scheduling source '{src.content_path}' for download")
         await scheduler.schedule(src)
 
     await scheduler.start()

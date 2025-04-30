@@ -1,6 +1,7 @@
-import datetime
 import logging
+import ddownloader.config as cfg
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from ddownloader.models import HttpGallerySource
 from .base import Scheduler
 from ..downloaders.gallery_downloader import GalleryDownloader
@@ -8,6 +9,8 @@ from ..downloaders.gallery_downloader import GalleryDownloader
 
 logger = logging.getLogger(__name__)
 gl_downloader = GalleryDownloader()
+crontab = cfg.gl_sync_crontab()
+jitter = cfg.gl_sync_jitter()
 
 
 class AIOGalleryDlScheduler(Scheduler):
@@ -24,16 +27,14 @@ class AIOGalleryDlScheduler(Scheduler):
         if not isinstance(src, HttpGallerySource):
             raise TypeError("src must be an instance of HttpGallerySource")
 
-        # TODO Tune up parameters below to ensure sequential download of sources
-        # Next run = now + 1 second
-        next_run = datetime.datetime.now() + datetime.timedelta(seconds=1)
+        logger.debug(f"Scheduling {src.id} with crontab: {crontab} and jitter: {jitter}")
+
+        # See: https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#examples
         self._scheduler.add_job(
-            func=gl_downloader.download,
+            gl_downloader.download,
+            CronTrigger.from_crontab(crontab),
             args=[src],
-            trigger='interval',     # TODO: Update to every night
-            seconds=30,             # TODO: make this configurable
-            misfire_grace_time=60,
-            #next_run_time=next_run
+            jitter=jitter,
         )
 
     async def start(self):
@@ -41,6 +42,5 @@ class AIOGalleryDlScheduler(Scheduler):
         """
         if not self._scheduler.running:
             self._scheduler.start()
-            logger.init("Galleries download Scheduler started")
         else:
             logger.warning("Gallery download Scheduler is already running")
