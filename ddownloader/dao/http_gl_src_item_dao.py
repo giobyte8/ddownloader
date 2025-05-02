@@ -1,4 +1,5 @@
-from ddownloader.models import HttpGallerySourceItem
+from uuid import UUID
+from ddownloader.models import HttpGallerySourceItem, SrcItemRemoteStatus
 from .tortoise.models import DBHttpGallerySourceItem
 
 
@@ -30,3 +31,61 @@ async def upsert(item: HttpGallerySourceItem) -> HttpGallerySourceItem:
             save()
 
     return item
+
+
+async def update_status_by_src_id(
+        src_id: UUID,
+        status: SrcItemRemoteStatus
+) -> int:
+    """Updates the remote status for all items of a given source.
+
+    Args:
+        src_id (UUID): Source's unique identifier.
+        status (SrcItemRemoteStatus): Target remote status for items.
+
+    Returns:
+        int: Number of rows updated.
+    """
+    return await DBHttpGallerySourceItem.\
+        filter(source_id=src_id).\
+        update(remote_status=status)
+
+
+async def update_status_by_src_id_and_status(
+        src_id: UUID,
+        old_status: SrcItemRemoteStatus,
+        new_status: SrcItemRemoteStatus
+) -> int:
+    """Updates the remote status for all items of a given source.
+
+    Args:
+        src_id (UUID): Source's unique identifier.
+        old_status (SrcItemRemoteStatus): Current remote status for items.
+        new_status (SrcItemRemoteStatus): Target remote status for items.
+
+    Returns:
+        int: Number of rows updated.
+    """
+    return await DBHttpGallerySourceItem.\
+        filter(source_id=src_id, remote_status=old_status).\
+        update(remote_status=new_status)
+
+
+async def update_status_by_src_id_and_filename(
+        src_id: UUID,
+        filename: str,
+        status: SrcItemRemoteStatus
+) -> int:
+    """Updates the remote status for a specific item of a given source.
+
+    Args:
+        src_id (UUID): Source's unique identifier.
+        filename (str): Filename of the item.
+        status (SrcItemRemoteStatus): Target remote status for the item.
+
+    Returns:
+        int: Number of rows updated.
+    """
+    return await DBHttpGallerySourceItem.\
+        filter(source_id=src_id, filename=filename).\
+        update(remote_status=status)

@@ -31,10 +31,14 @@ async def file_downloaded(src_id):
 async def file_skipped(src_id):
     jReq = await request.get_json()
     filename = jReq.get("filename")
-
     logger.debug(
         f"Running 'skipped' hook for src: { src_id } "
         f"and filename: {filename}"
     )
 
+    await src_item_dao.update_status_by_src_id_and_filename(
+        src_id=src_id,
+        filename=filename,
+        status=SrcItemRemoteStatus.FOUND
+    )
     return '', 201
