@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS http_single_file_source(
 CREATE TABLE IF NOT EXISTS http_gallery_source_item(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     source_id UUID NOT NULL,
-    path VARCHAR(5000) NOT NULL,
+    filename VARCHAR(5000) NOT NULL,
     remote_status VARCHAR(255) NOT NULL,
 
     FOREIGN KEY (source_id) REFERENCES http_gallery_source(id)
