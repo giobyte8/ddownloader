@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS http_gallery_source(
     url VARCHAR(5000) NOT NULL,
     content_path VARCHAR(5000) NOT NULL,
     sync_remote_deletes BOOLEAN NOT NULL DEFAULT true,
-    download_schedule VARCHAR(255) NOT NULL DEFAULT '0 0 * * SUN'
+    download_schedule VARCHAR(255) NOT NULL DEFAULT '0 0 * * SUN',
+    download_enabled BOOLEAN NOT NULL DEFAULT true
 );
 
 CREATE TABLE IF NOT EXISTS http_single_file_source(

@@ -10,7 +10,7 @@ async def start():
     logger.info("Starting download service...")
     scheduler = AIOGalleryDlScheduler()
 
-    sources = await src_dao.all()
+    sources = await src_dao.find_by_download_enabled(True)
     for src in sources:
         await scheduler.schedule(src)
 

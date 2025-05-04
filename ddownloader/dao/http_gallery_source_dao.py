@@ -26,7 +26,34 @@ async def find_by_id(src_id: str) -> HttpGallerySource | None:
         content_path=db_src.content_path,
         sync_remote_deletes=db_src.sync_remote_deletes,
         download_schedule=db_src.download_schedule,
+        download_enabled=db_src.download_enabled,
     )
+
+
+async def find_by_download_enabled(enabled: bool) -> list[HttpGallerySource]:
+    """
+    Find HTTP sources by download enabled status.
+
+    Args:
+        enabled (bool): Download enabled status.
+
+    Returns:
+        list[HttpGallerySource]: List of sources with the specified download enabled status.
+    """
+    db_sources = await DBHttpGallerySource.filter(download_enabled=enabled)
+
+    sources = []
+    for db_src in db_sources:
+        sources.append(HttpGallerySource(
+            id=db_src.id,
+            url=db_src.url,
+            content_path=db_src.content_path,
+            sync_remote_deletes=db_src.sync_remote_deletes,
+            download_schedule=db_src.download_schedule,
+            download_enabled=db_src.download_enabled,
+        ))
+
+    return sources
 
 
 async def all() -> list[HttpGallerySource]:
@@ -46,6 +73,7 @@ async def all() -> list[HttpGallerySource]:
             content_path=db_src.content_path,
             sync_remote_deletes=db_src.sync_remote_deletes,
             download_schedule=db_src.download_schedule,
+            download_enabled=db_src.download_enabled,
         ))
 
     return sources

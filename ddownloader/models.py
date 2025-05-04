@@ -16,6 +16,7 @@ class HttpGallerySource(HttpSource):
     content_path: str
     sync_remote_deletes: bool
     download_schedule: str
+    download_enabled: bool
 
 
 class SrcItemRemoteStatus(Enum):
