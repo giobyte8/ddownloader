@@ -6,6 +6,28 @@ from .tortoise.models import DBHttpGallerySource
 logger = logging.getLogger(__name__)
 
 
+async def find_by_id(src_id: str) -> HttpGallerySource | None:
+    """
+    Find HTTP source by ID.
+
+    Args:
+        src_id (str): Source ID.
+
+    Returns:
+        HttpGallerySource | None: Source object or None if not found.
+    """
+    db_src = await DBHttpGallerySource.get_or_none(id=src_id)
+    if db_src is None:
+        return None
+
+    return HttpGallerySource(
+        id=db_src.id,
+        url=db_src.url,
+        content_path=db_src.content_path,
+        sync_remote_deletes=db_src.sync_remote_deletes,
+    )
+
+
 async def all() -> list[HttpGallerySource]:
     """
     Get all HTTP sources from the database.

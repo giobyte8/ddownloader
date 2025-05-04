@@ -3,6 +3,35 @@ from ddownloader.models import HttpGallerySourceItem, SrcItemRemoteStatus
 from .tortoise.models import DBHttpGallerySourceItem
 
 
+async def find_by_src_id_and_status(
+        src_id: UUID,
+        status: SrcItemRemoteStatus
+) -> list[HttpGallerySourceItem]:
+    """Finds all items of a given source with a specific remote status.
+
+    Args:
+        src_id (UUID): Source's unique identifier.
+        status (SrcItemRemoteStatus): Remote status to filter items.
+
+    Returns:
+        list[HttpGallerySourceItem]: List of items matching the criteria.
+    """
+    db_items = await DBHttpGallerySourceItem.\
+        filter(source_id=src_id, remote_status=status).\
+        all()
+
+    items = []
+    for db_item in db_items:
+        items.append(HttpGallerySourceItem(
+            id=db_item.id,
+            source_id=db_item.source_id,
+            filename=db_item.filename,
+            remote_status=db_item.remote_status
+        ))
+
+    return items
+
+
 async def upsert(item: HttpGallerySourceItem) -> HttpGallerySourceItem:
     """
     Upsert an HTTP source item in the database.
@@ -89,3 +118,32 @@ async def update_status_by_src_id_and_filename(
     return await DBHttpGallerySourceItem.\
         filter(source_id=src_id, filename=filename).\
         update(remote_status=status)
+
+
+async def delete(item: HttpGallerySourceItem) -> None:
+    """Deletes an HTTP source item from the database.
+
+    Args:
+        item (HttpGallerySourceItem): The HTTP source item to delete.
+    """
+    await DBHttpGallerySourceItem.\
+        filter(id=item.id).\
+        delete()
+
+
+async def delete_by_src_id_and_status(
+        src_id: UUID,
+        status: SrcItemRemoteStatus
+) -> int:
+    """Deletes all items of a given source with a specific remote status.
+
+    Args:
+        src_id (UUID): Source's unique identifier.
+        status (SrcItemRemoteStatus): Remote status to filter items.
+
+    Returns:
+        int: Number of rows deleted.
+    """
+    return await DBHttpGallerySourceItem.\
+        filter(source_id=src_id, remote_status=status).\
+        delete()

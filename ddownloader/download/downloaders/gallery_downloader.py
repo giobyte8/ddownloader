@@ -1,5 +1,6 @@
 import logging
 from ddownloader.dao import http_gl_src_item_dao
+from ddownloader.hooks import source_downloaded
 from ddownloader.models import HttpGallerySource, SrcItemRemoteStatus
 from .. import gdl
 from .base import BaseDownloader
@@ -20,5 +21,4 @@ class GalleryDownloader(BaseDownloader):
         logger.debug(f"Updated { updated_count } items to UNKNOWN status")
 
         await gdl.download(src)
-        # TODO: Implement gdl post download hook to remove 'Unkown' items if 'applicable' (Were not found)
-        #       or just mark them as 'Not Found' if source.sync_remote_deletes is set to False
+        await source_downloaded.on_source_downloaded(src)
