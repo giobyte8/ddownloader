@@ -14,7 +14,8 @@ class HttpSingleFileSource(HttpSource):
 
 class HttpGallerySource(HttpSource):
     content_path: str
-    sync_remote_deletes: bool = True
+    sync_remote_deletes: bool
+    download_schedule: str
 
 
 class SrcItemRemoteStatus(Enum):

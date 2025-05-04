@@ -40,13 +40,5 @@ def runtime_path():
     return os.path.join(config_path(), "runtime")
 
 
-def gl_sync_crontab():
-    return os.getenv("GL_SYNC_CRONTAB", "0 0 * * *")
-
-
-def gl_sync_jitter():
-    return os.getenv("GL_SYNC_JITTER", 5)
-
-
 def api_key_hooks():
     return os.getenv("API_KEY_HOOKS")

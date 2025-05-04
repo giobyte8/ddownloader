@@ -10,6 +10,7 @@ class DBHttpGallerySource(Model):
     url = fields.CharField(max_length=5000)
     content_path = fields.CharField(max_length=5000)
     sync_remote_deletes = fields.BooleanField(default=True)
+    download_schedule = fields.CharField(max_length=255)
 
     class Meta:
         table = "http_gallery_source"

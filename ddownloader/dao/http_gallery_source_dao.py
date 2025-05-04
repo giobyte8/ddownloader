@@ -25,6 +25,7 @@ async def find_by_id(src_id: str) -> HttpGallerySource | None:
         url=db_src.url,
         content_path=db_src.content_path,
         sync_remote_deletes=db_src.sync_remote_deletes,
+        download_schedule=db_src.download_schedule,
     )
 
 
@@ -44,6 +45,7 @@ async def all() -> list[HttpGallerySource]:
             url=db_src.url,
             content_path=db_src.content_path,
             sync_remote_deletes=db_src.sync_remote_deletes,
+            download_schedule=db_src.download_schedule,
         ))
 
     return sources

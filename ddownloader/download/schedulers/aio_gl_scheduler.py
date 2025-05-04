@@ -1,5 +1,4 @@
 import logging
-import ddownloader.config as cfg
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from ddownloader.models import HttpGallerySource
@@ -9,8 +8,6 @@ from ..downloaders.gallery_downloader import GalleryDownloader
 
 logger = logging.getLogger(__name__)
 gl_downloader = GalleryDownloader()
-crontab = cfg.gl_sync_crontab()
-jitter = cfg.gl_sync_jitter()
 
 
 class AIOGalleryDlScheduler(Scheduler):
@@ -27,14 +24,18 @@ class AIOGalleryDlScheduler(Scheduler):
         if not isinstance(src, HttpGallerySource):
             raise TypeError("src must be an instance of HttpGallerySource")
 
-        logger.debug(f"Scheduling {src.id} with crontab: {crontab} and jitter: {jitter}")
+        logger.debug(f"Scheduling {src.id} with crontab: { src.download_schedule }")
 
         # See: https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#examples
         self._scheduler.add_job(
             gl_downloader.download,
-            CronTrigger.from_crontab(crontab),
+            CronTrigger.from_crontab(src.download_schedule),
             args=[src],
-            jitter=jitter,
+
+            # Will start the job with a delay of -60 to +60 seconds
+            # from the scheduled time. This is to prevent spikes in requests
+            # where multiple sources are scheduled at the same time.
+            jitter=60,
         )
 
     async def start(self):
