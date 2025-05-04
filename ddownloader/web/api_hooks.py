@@ -2,13 +2,15 @@ import logging
 from quart import Blueprint, request
 from ddownloader.models import HttpGallerySourceItem, SrcItemRemoteStatus
 from ddownloader.dao import http_gl_src_item_dao as src_item_dao
+from .security import api_key_hooks_required
 
 
 hooks_api = Blueprint("hooks", __name__)
 logger = logging.getLogger(__name__)
 
-# TODO: Require api key
+
 @hooks_api.route("/source/<uuid:src_id>/downloaded", methods=["POST"])
+@api_key_hooks_required()
 async def file_downloaded(src_id):
     jReq = await request.get_json()
     filename = jReq.get("filename")
@@ -28,6 +30,7 @@ async def file_downloaded(src_id):
 
 
 @hooks_api.route("/source/<uuid:src_id>/skipped", methods=["POST"])
+@api_key_hooks_required()
 async def file_skipped(src_id):
     jReq = await request.get_json()
     filename = jReq.get("filename")

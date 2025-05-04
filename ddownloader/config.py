@@ -46,3 +46,7 @@ def gl_sync_crontab():
 
 def gl_sync_jitter():
     return os.getenv("GL_SYNC_JITTER", 5)
+
+
+def api_key_hooks():
+    return os.getenv("API_KEY_HOOKS")

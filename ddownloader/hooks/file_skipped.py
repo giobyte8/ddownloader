@@ -27,9 +27,14 @@ url = (
 
 async def post_file_skipped():
     """Post to ddownloader API that a file has been skipped."""
+    headers = {"Authorization": f"Bearer { cfg.api_key_hooks() }"}
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, json={"filename": filename}) as resp:
+        async with session.post(
+            url,
+            json={"filename": filename},
+            headers=headers
+        ) as resp:
             if resp.status != 201:
                 print('Failed to notify ddownloader about skipped file')
                 sys.exit(1)
