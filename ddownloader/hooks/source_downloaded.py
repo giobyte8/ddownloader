@@ -1,4 +1,3 @@
-from uuid import UUID
 from ddownloader.dao import http_gl_src_item_dao as item_dao
 from ddownloader.models import HttpGallerySource, SrcItemRemoteStatus
 from ddownloader.services import file_svc

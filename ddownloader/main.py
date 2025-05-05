@@ -13,8 +13,9 @@ if not __package__ and not hasattr(sys, "frozen"):
     sys.path.insert(0, os.path.realpath(central_root))
 
 import ddownloader.config as cfg
-from ddownloader.download import download_svc
 from ddownloader.dao import database
+from ddownloader.download import download_svc
+from ddownloader.metrics.events import evt_tracker
 from ddownloader.web.app import app as downloader_app
 
 
@@ -33,6 +34,8 @@ async def before_serving():
 async def shutdown():
     for task in __bg_tasks:
         task.cancel()
+
+    await evt_tracker.cleanup()
 
 
 if __name__ == "__main__":

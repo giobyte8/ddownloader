@@ -42,3 +42,15 @@ def runtime_path():
 
 def api_key_hooks():
     return os.getenv("API_KEY_HOOKS")
+
+
+def ct_monitoring_enabled():
+    return os.getenv("CT_MONITORING_ENABLED", "false").lower() == "true"
+
+
+def ct_api_url():
+    return os.getenv("CT_API_URL")
+
+
+def ct_api_key():
+    return os.getenv("CT_API_KEY")
