@@ -1,5 +1,6 @@
 import logging
 import os
+from opentelemetry import trace
 from uuid import UUID
 import ddownloader.config as cfg
 from ddownloader.dao import http_gallery_source_dao as src_dao
@@ -7,8 +8,10 @@ from ddownloader.models import HttpGallerySourceItem
 
 
 logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(cfg.otel_svc_name())
 
 
+@tracer.start_as_current_span("file_svc.content_path")
 async def content_path(src_id: UUID) -> str:
     """Computes abs path to content folder for given source.
 

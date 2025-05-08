@@ -1,8 +1,14 @@
+from opentelemetry import trace
 from uuid import UUID
+from ddownloader import config as cfg
 from ddownloader.models import HttpGallerySourceItem, SrcItemRemoteStatus
 from .tortoise.models import DBHttpGallerySourceItem
 
 
+tracer = trace.get_tracer(cfg.otel_svc_name())
+
+
+@tracer.start_as_current_span("item_dao.find_by_src_id_and_status")
 async def find_by_src_id_and_status(
         src_id: UUID,
         status: SrcItemRemoteStatus
@@ -32,6 +38,7 @@ async def find_by_src_id_and_status(
     return items
 
 
+@tracer.start_as_current_span("item_dao.upsert")
 async def upsert(item: HttpGallerySourceItem) -> HttpGallerySourceItem:
     """
     Upsert an HTTP source item in the database.
@@ -62,6 +69,7 @@ async def upsert(item: HttpGallerySourceItem) -> HttpGallerySourceItem:
     return item
 
 
+@tracer.start_as_current_span("item_dao.update_status_by_src_id")
 async def update_status_by_src_id(
         src_id: UUID,
         status: SrcItemRemoteStatus
@@ -80,6 +88,7 @@ async def update_status_by_src_id(
         update(remote_status=status)
 
 
+@tracer.start_as_current_span("item_dao.update_status_by_src_id_and_status")
 async def update_status_by_src_id_and_status(
         src_id: UUID,
         old_status: SrcItemRemoteStatus,
@@ -100,6 +109,7 @@ async def update_status_by_src_id_and_status(
         update(remote_status=new_status)
 
 
+@tracer.start_as_current_span("item_dao.update_status_by_src_id_and_filename")
 async def update_status_by_src_id_and_filename(
         src_id: UUID,
         filename: str,
@@ -120,6 +130,7 @@ async def update_status_by_src_id_and_filename(
         update(remote_status=status)
 
 
+@tracer.start_as_current_span("item_dao.delete")
 async def delete(item: HttpGallerySourceItem) -> None:
     """Deletes an HTTP source item from the database.
 
@@ -131,6 +142,7 @@ async def delete(item: HttpGallerySourceItem) -> None:
         delete()
 
 
+@tracer.start_as_current_span("item_dao.delete_by_src_id_and_status")
 async def delete_by_src_id_and_status(
         src_id: UUID,
         status: SrcItemRemoteStatus

@@ -54,3 +54,7 @@ def ct_api_url():
 
 def ct_api_key():
     return os.getenv("CT_API_KEY")
+
+
+def otel_svc_name():
+    return os.getenv("OTEL_SERVICE_NAME", "ddownloader")

@@ -3,11 +3,16 @@ import json
 import logging
 import uuid
 import os
+from opentelemetry import trace
 import ddownloader.config as cfg
 from ddownloader import futils
 from ddownloader.models import HttpGallerySource
 
 
+trace = trace.get_tracer(cfg.otel_svc_name())
+
+
+@trace.start_as_current_span("gdl.download")
 async def download(src: HttpGallerySource) -> None:
     gl_content_path = os.path.join(cfg.galleries_path(), src.content_path)
     futils.assert_dir_exists(gl_content_path)
@@ -58,6 +63,7 @@ class GDLCfgFileBuilder:
         with open(cfg_template_path, 'r') as cfg_template:
             self.j_config = json.loads(cfg_template.read())
 
+    @trace.start_as_current_span("gdl.write_config_file")
     def build(self) -> str:
         cfg_file_path = os.path.join(
             cfg.runtime_path(),
