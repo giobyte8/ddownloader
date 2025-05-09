@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def app_env():
+    return os.getenv("APP_ENV", "prod")
+
+
 def app_port():
     return os.getenv("APP_PORT")
 

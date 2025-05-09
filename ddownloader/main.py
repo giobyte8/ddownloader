@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import sys
 from hypercorn.config import Config
@@ -19,6 +20,7 @@ from ddownloader.metrics.events import evt_tracker
 from ddownloader.web.app import app as downloader_app
 
 
+log = logging.getLogger("ddownloader.quart.app")
 __bg_tasks = set()
 
 
@@ -39,6 +41,14 @@ async def shutdown():
 
 
 if __name__ == "__main__":
-    downloader_app.run(
-        host='0.0.0.0',
-        port=cfg.app_port())
+    if cfg.app_env() in ["prod", "production"]:
+        hypercorn_cfg = Config()
+        hypercorn_cfg.accesslog = log
+        hypercorn_cfg.errorlog  = log
+        hypercorn_cfg.bind = [f"0.0.0.0:{ cfg.app_port() }"]
+
+        asyncio.run(serve(downloader_app, hypercorn_cfg))
+    else:
+        downloader_app.run(
+            host='0.0.0.0',
+            port=cfg.app_port())
