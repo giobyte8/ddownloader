@@ -16,7 +16,7 @@ if not __package__ and not hasattr(sys, "frozen"):
 import ddownloader.config as cfg
 from ddownloader.dao import database
 from ddownloader.download import download_svc
-from ddownloader.metrics.events import evt_tracker
+from ddownloader.metrics import tracker as metrics_tracker
 from ddownloader.web.app import app as downloader_app
 
 
@@ -37,7 +37,7 @@ async def shutdown():
     for task in __bg_tasks:
         task.cancel()
 
-    await evt_tracker.cleanup()
+    await metrics_tracker.cleanup()
 
 
 if __name__ == "__main__":

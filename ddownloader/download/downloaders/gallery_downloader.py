@@ -3,8 +3,8 @@ from opentelemetry import trace
 from ddownloader import config as cfg
 from ddownloader.dao import http_gl_src_item_dao
 from ddownloader.hooks import source_downloaded as src_downloaded_hook
-from ddownloader.metrics.events import evt_tracker
-from ddownloader.metrics.events.base import Event
+from ddownloader.metrics.events import SrcDownloadEvent
+from ddownloader.metrics.tracker import event_hub
 from ddownloader.models import HttpGallerySource, SrcItemRemoteStatus
 
 from .. import gdl
@@ -25,7 +25,7 @@ class GalleryDownloader(BaseDownloader):
         span.set_attribute("source.content_path", str(src.content_path))
 
         log.debug(f"Downloading source: { src.url }")
-        await evt_tracker.on(Event.SRC_DL_START, src=src)
+        await event_hub.on(SrcDownloadEvent.START, src=src)
 
         updated_count = await http_gl_src_item_dao.update_status_by_src_id(
             src.id,
@@ -35,4 +35,4 @@ class GalleryDownloader(BaseDownloader):
 
         await gdl.download(src)
         await src_downloaded_hook.on_source_downloaded(src)
-        await evt_tracker.on(Event.SRC_DL_END, src=src)
+        await event_hub.on(SrcDownloadEvent.END, src=src)
