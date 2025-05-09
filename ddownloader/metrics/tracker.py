@@ -2,6 +2,7 @@ from ddownloader import config as cfg
 from .events import Event
 from .trackers.base import EventTracker
 from .trackers.central_tracker import CentralEventTracker
+from .trackers.otel_tracker import OtelEventTracker
 
 
 class EventHub:
@@ -35,3 +36,6 @@ async def cleanup() -> None:
 if cfg.ct_monitoring_enabled():
     ct_tracker = CentralEventTracker()
     event_hub._add_tracker(ct_tracker)
+
+otel_tracker = OtelEventTracker()
+event_hub._add_tracker(otel_tracker)
