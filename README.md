@@ -9,14 +9,8 @@ to download into your server (Linux distro, Wallpaper, Photo album, Movie, etc),
 instead of going to your server and do a `wget` manually you just paste the url
 into the **DDownloader** UI and it will take care for you.
 
-## Install
-
-### Using docker
-
-
-### Using pip
-
+## Deployment
 
 ## Development
 
-Check [Development section](./Development.md)
+See [Development section](./docs/development.md)
