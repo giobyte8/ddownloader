@@ -94,3 +94,12 @@ When a new version is ready for release, follow below instructions to build and 
 
 > NOTE: Make sure to prepare docker builder to build [multi-arch images](https://giovanniaguirre.me/blog/docker_build_multiarch/) before building new image version
 
+### Build and push docker image
+
+Pass the new version number as tag to the `release.sh` script, it will take care of building the image, tag it with provided version and push it into docker registry.
+
+```shell
+./docker/release.sh -t 1.0.0 -p
+```
+
+> Note: You can ommit the `-p` flag to prevent the push step and test the image locally first

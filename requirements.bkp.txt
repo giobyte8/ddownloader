@@ -1,0 +1,14 @@
+Flask==2.0.2
+Flask-Cors==3.0.10
+Flask-Inputs==0.3.0
+huey==2.4.1
+jsonschema==4.2.1
+marshmallow==3.14.1
+python-dotenv==0.19.2
+requests==2.26.0
+pathvalidate==2.5.0
+
+# Dependencies for v2
+APScheduler==3.11.0
+pydantic==2.11.3
+Quart==0.20.0
