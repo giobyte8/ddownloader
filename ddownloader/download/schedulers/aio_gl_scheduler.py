@@ -19,7 +19,7 @@ class AIOGalleryDlScheduler(Scheduler):
 
     def __init__(self):
         store = self.__prepare_job_store()
-        self._scheduler = AsyncIOScheduler(jobstores={ "postgres": store })
+        self._scheduler = AsyncIOScheduler(jobstores={ "default": store })
 
     def __prepare_job_store(self) -> SQLAlchemyJobStore:
         """Prepares the job store for the scheduler.
