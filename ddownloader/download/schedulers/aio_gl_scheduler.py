@@ -1,6 +1,8 @@
 import logging
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from ddownloader import config as cfg
 from ddownloader.models import HttpGallerySource
 from .base import Scheduler
 from ..downloaders.gallery_downloader import GalleryDownloader
@@ -16,7 +18,21 @@ class AIOGalleryDlScheduler(Scheduler):
     """
 
     def __init__(self):
-        self._scheduler = AsyncIOScheduler()
+        store = self.__prepare_job_store()
+        self._scheduler = AsyncIOScheduler(jobstores={ "postgres": store })
+
+    def __prepare_job_store(self) -> SQLAlchemyJobStore:
+        """Prepares the job store for the scheduler.
+        """
+
+        # For details regarding how to compose URLs see:
+        # https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls
+        store_url = (
+            f"postgresql+psycopg://{cfg.db_user()}:{cfg.db_password()}@"
+            f"{cfg.db_host()}:{cfg.db_port()}/{cfg.db_name()}"
+        )
+
+        return SQLAlchemyJobStore(url=store_url)
 
     async def schedule(self, src: HttpGallerySource):
         """Schedules a given source for periodic download
@@ -30,6 +46,8 @@ class AIOGalleryDlScheduler(Scheduler):
         self._scheduler.add_job(
             gl_downloader.download,
             CronTrigger.from_crontab(src.download_schedule),
+            id=str(src.id),
+            replace_existing=True,
             args=[src],
 
             # Will start the job with a delay of -60 to +60 seconds
