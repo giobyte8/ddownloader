@@ -44,6 +44,16 @@ def runtime_path():
     return os.path.join(config_path(), "runtime")
 
 
+def logs_path():
+    """
+    Path to directory for log files.
+
+    Returns:
+        str: Path to logs directory.
+    """
+    return os.path.join(runtime_path(), "logs")
+
+
 def api_key_hooks():
     return os.getenv("API_KEY_HOOKS")
 

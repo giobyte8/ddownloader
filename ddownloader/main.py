@@ -20,7 +20,7 @@ from ddownloader.metrics import tracker as metrics_tracker
 from ddownloader.web.app import app as downloader_app
 
 
-log = logging.getLogger("ddownloader.quart.app")
+log = logging.getLogger("quart.app")
 __bg_tasks = set()
 
 

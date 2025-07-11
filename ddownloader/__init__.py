@@ -1,6 +1,11 @@
 import logging
+from logging.handlers import RotatingFileHandler
+from ddownloader import futils
+from ddownloader.config import logs_path
+
 
 _LOGGER_NAME = 'ddownloader'
+
 
 class ShortenedNameFormatter(logging.Formatter):
     """
@@ -100,3 +105,27 @@ dl_logger.addHandler(_ch)
 # _fh.setLevel(file_level)
 # _fh.setFormatter(_FORMATTER)
 #logger.addHandler(_fh)
+
+
+#################################################
+# Logger for Quart access and error logs
+
+quart_logger = logging.getLogger("quart.app")
+quart_logger.setLevel(logging.INFO)
+
+# Ensure the logs directory exists
+futils.mkdirs(logs_path())
+
+# Create a RotatingFileHandler
+file_handler = RotatingFileHandler(
+    filename=f"{ logs_path() }/quart_app.log",
+    maxBytes=50 * 1024 * 1024,  # 50MB
+    backupCount=5
+)
+
+# Reuse the ShortenedNameFormatter instance
+file_handler.setFormatter(_ch.formatter)
+
+# Remove other handlers and add the file handler
+quart_logger.handlers = []
+quart_logger.addHandler(file_handler)

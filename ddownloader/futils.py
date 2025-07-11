@@ -33,3 +33,12 @@ def assert_file_exists(path: str) -> None:
     """
     if not os.path.isfile(path):
         raise FileNotFoundError(f"File '{path}' does not exist.")
+
+def mkdirs(path: str) -> None:
+    """Creates a directory and all its parent directories if they don't exist.
+
+    Args:
+        path (str): Path to directory to create.
+    """
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
