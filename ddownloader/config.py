@@ -1,3 +1,4 @@
+import logging
 import os
 from dotenv import load_dotenv
 
@@ -52,6 +53,24 @@ def logs_path():
         str: Path to logs directory.
     """
     return os.path.join(runtime_path(), "logs")
+
+
+def log_level():
+    raw_level = os.getenv("LOG_LEVEL", "INFO").upper()
+
+    if raw_level == "DEBUG":
+        return logging.DEBUG
+    elif raw_level == "INFO":
+        return logging.INFO
+    elif raw_level == "WARNING":
+        return logging.WARNING
+    elif raw_level == "ERROR":
+        return logging.ERROR
+    elif raw_level == "CRITICAL":
+        return logging.CRITICAL
+
+    else:
+        raise logging.INFO
 
 
 def api_key_hooks():

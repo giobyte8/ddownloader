@@ -24,15 +24,16 @@ class GalleryDownloader(BaseDownloader):
         span.set_attribute("source.url", str(src.url))
         span.set_attribute("source.content_path", str(src.content_path))
 
-        log.debug(f"Downloading source: { src.url }")
+        log.info("src: %s - Downloading from %s", src.id, src.url)
         await event_hub.on(SrcDownloadEvent.START, src=src)
 
-        updated_count = await http_gl_src_item_dao.update_status_by_src_id(
+        updates_count = await http_gl_src_item_dao.update_status_by_src_id(
             src.id,
             SrcItemRemoteStatus.UNKNOWN
         )
-        log.debug(f"Updated { updated_count } items to UNKNOWN status")
+        log.info("src: %s - Updated %d items to UNKNOWN status", src.id, updates_count)
 
         await gdl.download(src)
         await src_downloaded_hook.on_source_downloaded(src)
         await event_hub.on(SrcDownloadEvent.END, src=src)
+        log.info("src: %s - Download completed", src.id)

@@ -20,7 +20,8 @@ from ddownloader.metrics import tracker as metrics_tracker
 from ddownloader.web.app import app as downloader_app
 
 
-log = logging.getLogger("quart.app")
+log        = logging.getLogger("ddownloader")
+quart_log  = logging.getLogger("quart.app")
 __bg_tasks = set()
 
 
@@ -41,14 +42,19 @@ async def shutdown():
 
 
 if __name__ == "__main__":
+    host = "0.0.0.0"
+    port = cfg.app_port()
+
     if cfg.app_env() in ["prod", "production"]:
         hypercorn_cfg = Config()
-        hypercorn_cfg.accesslog = log
-        hypercorn_cfg.errorlog  = log
-        hypercorn_cfg.bind = [f"0.0.0.0:{ cfg.app_port() }"]
+        hypercorn_cfg.accesslog = quart_log
+        hypercorn_cfg.errorlog  = quart_log
+        hypercorn_cfg.bind = [f"{ host }:{ port }"]
 
+        log.info("Running quart app on: %s:%s", host, port)
         asyncio.run(serve(downloader_app, hypercorn_cfg))
     else:
         downloader_app.run(
-            host='0.0.0.0',
-            port=cfg.app_port())
+            host=host,
+            port=port
+        )

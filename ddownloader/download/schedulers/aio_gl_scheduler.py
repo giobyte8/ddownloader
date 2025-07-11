@@ -8,7 +8,7 @@ from .base import Scheduler
 from ..downloaders.gallery_downloader import GalleryDownloader
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 gl_downloader = GalleryDownloader()
 
 
@@ -40,7 +40,7 @@ class AIOGalleryDlScheduler(Scheduler):
         if not isinstance(src, HttpGallerySource):
             raise TypeError("src must be an instance of HttpGallerySource")
 
-        logger.debug(f"Scheduling {src.id} with crontab: { src.download_schedule }")
+        log.info("src: %s - Scheduling with crontab: %s", src.id, src.download_schedule)
 
         # See: https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#examples
         self._scheduler.add_job(
@@ -62,4 +62,4 @@ class AIOGalleryDlScheduler(Scheduler):
         if not self._scheduler.running:
             self._scheduler.start()
         else:
-            logger.warning("Gallery download Scheduler is already running")
+            log.warning("Gallery download Scheduler is already running")

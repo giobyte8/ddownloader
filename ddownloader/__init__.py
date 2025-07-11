@@ -1,7 +1,7 @@
 import logging
+import ddownloader.config as cfg
 from logging.handlers import RotatingFileHandler
 from ddownloader import futils
-from ddownloader.config import logs_path
 
 
 _LOGGER_NAME = 'ddownloader'
@@ -86,7 +86,7 @@ _ch.setFormatter(ShortenedNameFormatter(
 
 # Set up "ddownloader.*" loggers level
 dl_logger = logging.getLogger(_LOGGER_NAME)
-dl_logger.setLevel(logging.DEBUG)
+dl_logger.setLevel(cfg.log_level())
 dl_logger.addHandler(_ch)
 
 
@@ -114,11 +114,11 @@ quart_logger = logging.getLogger("quart.app")
 quart_logger.setLevel(logging.INFO)
 
 # Ensure the logs directory exists
-futils.mkdirs(logs_path())
+futils.mkdirs(cfg.logs_path())
 
 # Create a RotatingFileHandler
 file_handler = RotatingFileHandler(
-    filename=f"{ logs_path() }/quart_app.log",
+    filename=f"{ cfg.logs_path() }/quart_app.log",
     maxBytes=50 * 1024 * 1024,  # 50MB
     backupCount=5
 )
