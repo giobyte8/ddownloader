@@ -130,15 +130,29 @@ async def page(
 
 @tracer.start_as_current_span("download_job_dao.find_by_id")
 async def find_by_id(job_id: UUID) -> GallerySrcDownloadJob | None:
-    db_job = await DBGallerySrcDownloadJob.get_or_none(id=job_id)
+    db_job = await DBGallerySrcDownloadJob\
+        .get_or_none(id=job_id)\
+        .prefetch_related("source")
     if db_job is None:
         return None
+
+    source = None
+    if getattr(db_job, "source", None) is not None:
+        source = HttpGallerySource(
+            id=db_job.source.id,
+            url=db_job.source.url,
+            content_path=db_job.source.content_path,
+            sync_remote_deletes=db_job.source.sync_remote_deletes,
+            download_schedule=db_job.source.download_schedule,
+            download_enabled=db_job.source.download_enabled,
+        )
 
     return GallerySrcDownloadJob(
         id=db_job.id,
         source_id=db_job.source_id,
         started_at=db_job.started_at,
         completed_at=db_job.completed_at,
+        source=source,
     )
 
 

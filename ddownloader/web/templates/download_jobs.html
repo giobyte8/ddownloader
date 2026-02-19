@@ -92,7 +92,17 @@
                 <table>
                   <tr>
                     <td class="text-secondary text-end">Downloaded files:</td>
-                    <td class="ps-2">{{ job.downloaded_files_count }}</td>
+                    <td class="ps-2">
+                      {% if job.downloaded_files_count > 0 %}
+                        <a
+                          href="/sources/download_jobs/{{ job.id }}/downloaded_files"
+                        >
+                          {{ job.downloaded_files_count }}
+                        </a>
+                      {% else %}
+                        {{ job.downloaded_files_count }}
+                      {% endif %}
+                    </td>
                   </tr>
                   <tr>
                     <td class="text-secondary text-end">Skipped files:</td>
@@ -229,7 +239,17 @@
                         <span class="d-sm-none">Downloaded:</span>
                         <span class="d-none d-sm-inline">Downloaded files:</span>
                       </td>
-                      <td class="ps-sm-2">{{ job.downloaded_files_count }}</td>
+                      <td class="ps-sm-2">
+                        {% if job.downloaded_files_count > 0 %}
+                          <a
+                            href="/sources/download_jobs/{{ job.id }}/downloaded_files"
+                          >
+                            {{ job.downloaded_files_count }}
+                          </a>
+                        {% else %}
+                          {{ job.downloaded_files_count }}
+                        {% endif %}
+                      </td>
                     </tr>
                     <tr>
                       <td class="text-secondary text-end">
@@ -362,5 +382,5 @@
 {% endblock %}
 
 {% block scripts %}
-  <script defer src="{{ url_for('static', filename='js/download_jobs.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/format_datetimes.js') }}"></script>
 {% endblock %}

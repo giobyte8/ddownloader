@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Downloaded files{% endblock %}
+
+{% block content %}
+  <header class="mb-2 mb-sm-3 align-middle">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1 class="h3 mb-1">Downloaded files</h1>
+      </div>
+
+      <div class="col-12 col-sm-6 text-sm-end pt-sm-1">
+        <span class="badge text-bg-secondary">{{ total }} total</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <p class="text-secondary mb-0">
+          <a class="text-decoration-none" href="/sources/download_jobs">
+            ⬅ Back to Download Jobs
+          </a>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Job details -->
+  <div class="card shadow-sm small mb-3">
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-12 col-md-7 col-lg-6">
+          <div class="text-secondary mb-2 mb-md-3">
+            <span>Job id:</span>
+            <span>{{ job.id }}</span>
+          </div>
+
+          <div class="font-monospace">
+            {{ job.source.content_path }}
+          </div>
+          <a
+            class="text-decoration-none"
+            href="{{ job.source.url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ job.source.url }}
+          </a>
+        </div>
+
+        <div class="col-6 col-md-5 col-lg-6 pt-2 pt-md-0">
+          <table>
+            <tr>
+              <td class="text-secondary text-end align-top">
+                <span class="d-none d-md-inline">Started:</span>
+                <span class="d-md-none">Start:</span>
+              </td>
+              <td class="ps-2">
+                <time class="rel-time" datetime="{{ job.started_at.isoformat() }}">
+                  {{ job.started_at }}
+                </time>
+                <br>
+                <time
+                  class="fm-datetime small text-secondary"
+                  datetime="{{ job.started_at.isoformat() }}"
+                >
+                  {{ job.started_at }}
+                </time>
+              </td>
+            </tr>
+            <tr class="d-none d-md-table-row">
+              <td class="text-secondary text-end align-top">Completed:</td>
+              <td class="ps-2">
+                {% if job.completed_at %}
+                  <time class="rel-time" datetime="{{ job.completed_at.isoformat() }}">
+                    {{ job.completed_at }}
+                  </time>
+                  <br>
+                  <time
+                    class="fm-datetime small text-secondary"
+                    datetime="{{ job.completed_at.isoformat() }}"
+                  >
+                    {{ job.completed_at }}
+                  </time>
+                {% else %}
+                  <span class="text-secondary">Not yet</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td class="text-secondary text-end align-top">
+                <span class="d-none d-md-inline">Duration:</span>
+                <span class="d-md-none">⏱️:</span>
+              </td>
+              <td class="ps-2">
+                {% if job.started_at and job.completed_at %}
+                  <span
+                    class="js-duration"
+                    data-start="{{ job.started_at.isoformat() }}"
+                    data-end="{{ job.completed_at.isoformat() }}"
+                  >
+                    {{ (job.completed_at - job.started_at) }}
+                  </span>
+                {% else %}
+                  <span class="text-secondary">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="col-6 d-md-none pt-2">
+          <table>
+            <tr class="">
+              <td class="text-secondary text-end align-top">
+                <span class="d-none d-md-inline">Completed:</span>
+                <span class="d-md-none">End:</span>
+              </td>
+              <td class="ps-2">
+                {% if job.completed_at %}
+                  <time class="rel-time" datetime="{{ job.completed_at.isoformat() }}">
+                    {{ job.completed_at }}
+                  </time>
+                  <br>
+                  <time
+                    class="fm-datetime small text-secondary"
+                    datetime="{{ job.completed_at.isoformat() }}"
+                  >
+                    {{ job.completed_at }}
+                  </time>
+                {% else %}
+                  <span class="text-secondary">Not yet</span>
+                {% endif %}
+              </td>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if not files or (files|length) == 0 %}
+    <div class="alert alert-info" role="alert">No downloaded files available.</div>
+  {% else %}
+    <!-- Downloaded files on large screens -->
+    <div class="table-responsive d-none d-lg-block">
+      <table class="table table-striped align-middle mb-0 small">
+        <thead>
+          <tr>
+            <th scope="col">📄 Filename</th>
+            <th scope="col">⏱️ Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in files %}
+            <tr>
+              <td class="wrap-anywhere">
+                <span class="mono">{{ f.src_item.filename if f.src_item else f.src_item_id }}</span>
+              </td>
+              <td>
+                {% if f.created_at %}
+                  <time class="rel-time" datetime="{{ f.created_at.isoformat() }}">{{ f.created_at }}</time>
+                  <br>
+                  <time class="fm-datetime small text-secondary" datetime="{{ f.created_at.isoformat() }}">{{ f.created_at }}</time>
+                {% else %}
+                  <span class="text-secondary">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Downloaded files on small screens -->
+    <div class="d-lg-none">
+      <div class="d-flex flex-column gap-2">
+        {% for f in files %}
+          <div class="card shadow-sm small">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12 col-sm-8">
+                  <div class="text-secondary">Filename</div>
+                  <div class="font-monospace">
+                    {{ f.src_item.filename }}
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-4 pt-2 pt-sm-0">
+                  <div class="text-secondary">Created</div>
+                    <time class="rel-time" datetime="{{ f.created_at.isoformat() }}">
+                      {{ f.created_at }}
+                    </time>
+                    <br>
+                    <time
+                      class="fm-datetime small text-secondary"
+                      datetime="{{ f.created_at.isoformat() }}"
+                    >
+                      {{ f.created_at }}
+                    </time>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% set base_path = '/sources/download_jobs/' ~ job_id ~ '/downloaded_files' %}
+    {% set common_qs = 'page_size=' ~ page_size %}
+
+    <nav class="mt-3" aria-label="Downloaded files pagination">
+      <ul class="pagination justify-content-center mb-0">
+        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+          <a class="page-link" href="{{ base_path }}?{{ common_qs }}&page={{ page - 1 }}" aria-label="Previous">&laquo;</a>
+        </li>
+
+        {% set start_page = page - 2 %}
+        {% if start_page < 1 %}{% set start_page = 1 %}{% endif %}
+        {% set end_page = start_page + 4 %}
+        {% if end_page > total_pages %}{% set end_page = total_pages %}{% endif %}
+        {% if end_page - start_page < 4 %}
+          {% set start_page = end_page - 4 %}
+          {% if start_page < 1 %}{% set start_page = 1 %}{% endif %}
+        {% endif %}
+
+        {% if start_page > 1 %}
+          <li class="page-item"><a class="page-link" href="{{ base_path }}?{{ common_qs }}&page=1">1</a></li>
+          {% if start_page > 2 %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+        {% endif %}
+
+        {% for p in range(start_page, end_page + 1) %}
+          <li class="page-item {% if p == page %}active{% endif %}">
+            <a class="page-link" href="{{ base_path }}?{{ common_qs }}&page={{ p }}">{{ p }}</a>
+          </li>
+        {% endfor %}
+
+        {% if end_page < total_pages %}
+          {% if end_page < total_pages - 1 %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+          <li class="page-item"><a class="page-link" href="{{ base_path }}?{{ common_qs }}&page={{ total_pages }}">{{ total_pages }}</a></li>
+        {% endif %}
+
+        <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+          <a class="page-link" href="{{ base_path }}?{{ common_qs }}&page={{ page + 1 }}" aria-label="Next">&raquo;</a>
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script defer src="{{ url_for('static', filename='js/format_datetimes.js') }}"></script>
+{% endblock %}

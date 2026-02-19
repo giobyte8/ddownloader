@@ -50,6 +50,8 @@ class DownloadJobDownloadedFile(BaseModel):
     src_item_id: UUID
     created_at: datetime | None = None
 
+    src_item: HttpGallerySourceItem | None = None
+
 
 class DownloadJobSkippedFile(BaseModel):
     id: UUID = uuid4()
