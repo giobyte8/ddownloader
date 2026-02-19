@@ -3,6 +3,7 @@ from .events import Event
 from .trackers.base import EventTracker
 from .trackers.central_tracker import CentralEventTracker
 from .trackers.otel_tracker import OtelEventTracker
+from .trackers.download_jobs_tracker import DownloadJobsTracker
 
 
 class EventHub:
@@ -39,3 +40,6 @@ if cfg.ct_monitoring_enabled():
 
 otel_tracker = OtelEventTracker()
 event_hub._add_tracker(otel_tracker)
+
+jobs_tracker = DownloadJobsTracker()
+event_hub._add_tracker(jobs_tracker)

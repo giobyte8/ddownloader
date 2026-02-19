@@ -1,3 +1,4 @@
+from uuid import UUID
 from ddownloader.models import HttpGallerySource
 from ..central import notifications as ct_notif
 from ..events import Event, SrcDownloadEvent
@@ -21,10 +22,10 @@ class CentralEventTracker(EventTracker):
         elif evt == SrcDownloadEvent.END:
             await self.on_src_download_end(**kwargs)
 
-    async def on_src_download_start(self, src: HttpGallerySource) -> None:
+    async def on_src_download_start(self, job_id: UUID, src: HttpGallerySource) -> None:
         msg = f"Starting download for: { src.content_path }"
         await ct_notif.notify(msg)
 
-    async def on_src_download_end(self, src: HttpGallerySource) -> None:
+    async def on_src_download_end(self, job_id: UUID, src: HttpGallerySource) -> None:
         msg = f"Download complete for: { src.content_path }"
         await ct_notif.notify(msg)

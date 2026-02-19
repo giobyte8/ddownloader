@@ -66,27 +66,35 @@ class OtelEventTracker(EventTracker):
         elif evt == SrcDownloadEvent.FILE_SKIPPED:
             await self.on_file_skipped(**kwargs)
 
-    async def on_src_download_start(self, src: HttpGallerySource) -> None:
+    async def on_src_download_start(
+        self,
+        job_id: UUID,
+        src: HttpGallerySource
+    ) -> None:
         counter_src_download_start.add(1, {
             "src_id": str(src.id),
             "content_path": src.content_path,
             "url": str(src.url)
         })
 
-    async def on_src_download_end(self, src: HttpGallerySource) -> None:
+    async def on_src_download_end(
+        self,
+        job_id: UUID,
+        src: HttpGallerySource
+    ) -> None:
         counter_src_download_end.add(1, {
             "src_id": str(src.id),
             "content_path": src.content_path,
             "url": str(src.url)
         })
 
-    async def on_file_downloaded(self, src_id: UUID, filename: str) -> None:
+    async def on_file_downloaded(self, src_id: UUID, filename: str, **kwargs) -> None:
        counter_files_downloaded.add(1, {
            "src_id": str(src_id),
            "filename": filename
         })
 
-    async def on_file_skipped(self, src_id: UUID, filename: str) -> None:
+    async def on_file_skipped(self, src_id: UUID, filename: str, **kwargs) -> None:
         counter_files_skipped.add(1, {
            "src_id": str(src_id),
            "filename": filename

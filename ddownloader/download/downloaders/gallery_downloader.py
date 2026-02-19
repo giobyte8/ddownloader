@@ -1,4 +1,5 @@
 import logging
+import uuid
 from opentelemetry import trace
 from ddownloader import config as cfg
 from ddownloader.dao import http_gl_src_item_dao
@@ -24,16 +25,33 @@ class GalleryDownloader(BaseDownloader):
         span.set_attribute("source.url", str(src.url))
         span.set_attribute("source.content_path", str(src.content_path))
 
-        log.info("src: %s - Downloading from %s", src.id, src.url)
-        await event_hub.on(SrcDownloadEvent.START, src=src)
+        # Generate uuid for tracking this download job
+        download_job_id = uuid.uuid4()
+
+        log.info(
+            "job_id: %s, src: %s - Downloading from %s",
+            download_job_id,
+            src.id,
+            src.url
+        )
+        await event_hub.on(SrcDownloadEvent.START, job_id=download_job_id, src=src)
 
         updates_count = await http_gl_src_item_dao.update_status_by_src_id(
             src.id,
             SrcItemRemoteStatus.UNKNOWN
         )
-        log.info("src: %s - Updated %d items to UNKNOWN status", src.id, updates_count)
+        log.info(
+            "job_id: %s, src: %s - Updated %d items to UNKNOWN status",
+            download_job_id,
+            src.id,
+            updates_count
+        )
 
-        await gdl.download(src)
+        await gdl.download(download_job_id, src)
         await src_downloaded_hook.on_source_downloaded(src)
-        await event_hub.on(SrcDownloadEvent.END, src=src)
-        log.info("src: %s - Download completed", src.id)
+        await event_hub.on(SrcDownloadEvent.END, job_id=download_job_id, src=src)
+        log.info(
+            "job_id: %s, src: %s - Download completed",
+            download_job_id,
+            src.id
+        )

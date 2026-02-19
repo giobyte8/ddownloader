@@ -5,7 +5,11 @@ from .app_sources import sources_app
 
 
 logger = logging.getLogger(__name__)
-app = Quart(__name__)
+app = Quart(
+    __name__,
+    static_folder="static",
+    static_url_path="/static",
+)
 app.register_blueprint(hooks_api, url_prefix="/api/hooks")
 app.register_blueprint(sources_app, url_prefix="/sources")
 

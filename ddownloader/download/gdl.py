@@ -4,6 +4,7 @@ import logging
 import uuid
 import os
 from opentelemetry import trace
+from uuid import UUID
 import ddownloader.config as cfg
 from ddownloader import futils
 from ddownloader.models import HttpGallerySource
@@ -13,21 +14,25 @@ trace = trace.get_tracer(cfg.otel_svc_name())
 
 
 @trace.start_as_current_span("gdl.download")
-async def download(src: HttpGallerySource) -> None:
+async def download(download_job_id: UUID, src: HttpGallerySource) -> None:
     gl_content_path = os.path.join(cfg.galleries_path(), src.content_path)
     futils.assert_dir_exists(gl_content_path)
 
     cmd_file_skipped = [
         'python',
         'ddownloader/hooks/file_skipped.py',
+        str(download_job_id),
         str(src.id),
-        '{_filename}']
+        '{_filename}'
+    ]
 
     cmd_file_downloaded = [
         'python',
         'ddownloader/hooks/file_downloaded.py',
+        str(download_job_id),
         str(src.id),
-        '{_filename}']
+        '{_filename}'
+    ]
 
     gdl_cfg_file_path = GDLCfgFileBuilder() \
         .hook('skip', cmd_file_skipped) \

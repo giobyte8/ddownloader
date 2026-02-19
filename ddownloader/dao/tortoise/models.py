@@ -35,3 +35,59 @@ class DBHttpGallerySourceItem(Model):
 
     class Meta:
         table = "http_gallery_source_item"
+
+
+class DBGallerySrcDownloadJob(Model):
+    """Database Tortoise model for gallery source download jobs."""
+
+    id = fields.UUIDField(primary_key=True)
+    source = fields.ForeignKeyField(
+        "models.DBHttpGallerySource",
+        related_name="download_jobs",
+        on_delete=fields.CASCADE
+    )
+    started_at = fields.DatetimeField(auto_now_add=True)
+    completed_at = fields.DatetimeField(null=True)
+
+    class Meta:
+        table = "gallery_src_download_job"
+
+
+class DBDownloadJobDownloadedFile(Model):
+    """Database Tortoise model for files downloaded by a job."""
+
+    id = fields.UUIDField(primary_key=True)
+    job = fields.ForeignKeyField(
+        "models.DBGallerySrcDownloadJob",
+        related_name="downloaded_files",
+        on_delete=fields.CASCADE
+    )
+    src_item = fields.ForeignKeyField(
+        "models.DBHttpGallerySourceItem",
+        related_name="downloaded_files",
+        on_delete=fields.CASCADE
+    )
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+    class Meta:
+        table = "download_job_downloaded_file"
+
+
+class DBDownloadJobSkippedFile(Model):
+    """Database Tortoise model for files skipped by a job."""
+
+    id = fields.UUIDField(primary_key=True)
+    job = fields.ForeignKeyField(
+        "models.DBGallerySrcDownloadJob",
+        related_name="skipped_files",
+        on_delete=fields.CASCADE
+    )
+    src_item = fields.ForeignKeyField(
+        "models.DBHttpGallerySourceItem",
+        related_name="skipped_files",
+        on_delete=fields.CASCADE
+    )
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+    class Meta:
+        table = "download_job_skipped_file"

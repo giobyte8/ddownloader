@@ -18,8 +18,9 @@ if __name__ == '__main__':
 import ddownloader.config as cfg
 
 
-source_id = sys.argv[1]
-filename = sys.argv[2]
+download_job_id = sys.argv[1]
+source_id = sys.argv[2]
+filename = sys.argv[3]
 url = (
     f"http://localhost:{ cfg.app_port() }/"
     f"api/hooks/source/{ source_id }/downloaded"
@@ -32,7 +33,7 @@ async def post_file_downloaded():
     async with aiohttp.ClientSession() as session:
         async with session.post(
             url,
-            json={"filename": filename},
+            json={"download_job_id": download_job_id, "filename": filename},
             headers=headers
         ) as resp:
             if resp.status != 201:

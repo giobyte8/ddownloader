@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 @api_key_hooks_required()
 async def file_downloaded(src_id):
     jReq = await request.get_json()
+    download_job_id = jReq.get("download_job_id")
     filename = jReq.get("filename")
     logger.debug(
         f"Running 'downloaded' hook for src: { src_id } "
@@ -30,7 +31,9 @@ async def file_downloaded(src_id):
 
     await event_hub.on(
         SrcDownloadEvent.FILE_DOWNLOADED,
+        job_id=download_job_id,
         src_id=src_id,
+        src_item_id=item.id,
         filename=filename
     )
     return '', 201
@@ -40,21 +43,25 @@ async def file_downloaded(src_id):
 @api_key_hooks_required()
 async def file_skipped(src_id):
     jReq = await request.get_json()
+    download_job_id = jReq.get("download_job_id")
     filename = jReq.get("filename")
     logger.debug(
         f"Running 'skipped' hook for src: { src_id } "
         f"and filename: {filename}"
     )
 
-    await src_item_dao.update_status_by_src_id_and_filename(
-        src_id=src_id,
+    item = HttpGallerySourceItem(
+        source_id=src_id,
         filename=filename,
-        status=SrcItemRemoteStatus.FOUND
+        remote_status=SrcItemRemoteStatus.FOUND
     )
+    item = await src_item_dao.upsert(item)
 
     await event_hub.on(
         SrcDownloadEvent.FILE_SKIPPED,
+        job_id=download_job_id,
         src_id=src_id,
+        src_item_id=item.id,
         filename=filename
     )
     return '', 201
