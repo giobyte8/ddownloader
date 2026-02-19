@@ -3,119 +3,145 @@
 {% block title %}Sources{% endblock %}
 
 {% block content %}
-  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-4">
-    <div>
-      <h1 class="h3 mb-1">HttpGallery Sources</h1>
-      <p class="text-secondary mb-0">All sources currently stored in the database.</p>
+  <header class="mb-2 mb-sm-4">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1 class="h3 mb-1">Http Gallery Sources</h1>
+      </div>
+
+      <div class="col-12 col-sm-6 text-sm-end pt-sm-1">
+        <span class="badge text-bg-secondary d-none">Showing xx - yy</span>
+        <span class="badge text-bg-secondary">{{ sources|length }} total</span>
+      </div>
     </div>
-    <div class="text-secondary">
-      <span class="badge text-bg-primary">{{ sources|length }} total</span>
-    </div>
-  </div>
+  </header>
 
   {% if sources and (sources|length) > 0 %}
-    <!-- Mobile-friendly cards -->
-    <div class="d-md-none">
-      <div class="row g-3">
-        {% for src in sources %}
-          <div class="col-12">
-            <div class="card shadow-sm">
-              <div class="card-body">
-                <!-- Header area: content path + url (no labels) -->
-                <div class="mono fw-semibold wrap-anywhere">{{ src.content_path }}</div>
-                <div class="small wrap-anywhere mt-1">
-                  {% if src.url %}
-                    <a href="{{ src.url }}" target="_blank" rel="noopener noreferrer" class="link-primary">{{ src.url }}</a>
-                  {% else %}
-                    <span class="text-secondary">—</span>
-                  {% endif %}
+
+    <!-- Desktop table -->
+    <div class="table-responsive d-none d-lg-block">
+      <table class="table table-striped align-middle mb-0 small">
+        <thead>
+          <tr>
+            <th scope="col">🔗 Source</th>
+            <th scope="col">📅 Schedule</th>
+            <th scope="col">⚙️ Config</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for src in sources %}
+            <tr>
+              <td>
+                <div class="font-monospace">
+                  {{ src.content_path }}
                 </div>
+                <a
+                  class="text-decoration-none"
+                  href="{{ src.url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ src.url }}
+                </a>
 
-                <hr class="my-3" />
+                <div class="pt-2 text-secondary small">
+                  <table>
+                    <tr>
+                      <td>Source id:</td>
+                      <td class="ps-2">
+                        <span>{{ src.id }}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
 
-                <div class="row g-3">
-                  <div class="col-12 col-sm-6">
-                    <div class="small text-secondary">Download enabled</div>
-                    <div>
+              <td class="font-monospace">{{ src.download_schedule }}</td>
+
+              <td>
+                <table>
+                  <tr>
+                    <td class="text-end">Enabled:</td>
+                    <td class="ps-2">
                       {% if src.download_enabled %}
-                        <span class="badge text-bg-success">Enabled</span>
+                        <span class="badge text-bg-success">Yes</span>
                       {% else %}
-                        <span class="badge text-bg-secondary">Disabled</span>
+                        <span class="badge text-bg-secondary">No</span>
                       {% endif %}
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
 
-                  <div class="col-12 col-sm-6">
-                    <div class="small text-secondary">Sync remote deletes</div>
-                    <div>
+                  <tr>
+                    <td class="pt-2 text-end">Sync deletes:</td>
+                    <td class="pt-2 ps-2">
                       {% if src.sync_remote_deletes %}
                         <span class="badge text-bg-warning">Yes</span>
                       {% else %}
-                        <span class="badge text-bg-light text-secondary border">No</span>
+                        <span class="badge text-bg-secondary">No</span>
                       {% endif %}
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-                  <div class="col-12">
-                    <div class="small text-secondary">Download schedule</div>
-                    <div class="mono wrap-anywhere">{{ src.download_schedule }}</div>
+    <!-- Mobile-friendly cards -->
+    <div class="d-lg-none">
+      <div class="d-flex flex-column gap-2">
+        {% for src in sources %}
+          <div class="card shadow-sm small">
+            <div class="card-body pb-4">
+              <div class="row">
+
+                <!-- Header area: content path + url (no labels) -->
+                <div class="col-12">
+                  <div class="font-monospace">{{ src.content_path }}</div>
+                  <a
+                    class="text-decoration-none"
+                    href="{{ src.url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ src.url }}
+                  </a>
+                </div>
+
+                <!-- Schedule -->
+                <div class="col-12 pt-3">
+                  <div class="small text-secondary">Download schedule</div>
+                  <div class="font-monospace">{{ src.download_schedule }}</div>
+                </div>
+
+
+                <div class="pt-2 col-6">
+                  <div class="small text-secondary">Download enabled</div>
+                  <div>
+                    {% if src.download_enabled %}
+                      <span class="badge text-bg-success">Enabled</span>
+                    {% else %}
+                      <span class="badge text-bg-secondary">Disabled</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="pt-2 col-6">
+                  <div class="small text-secondary">Sync remote deletes</div>
+                  <div>
+                    {% if src.sync_remote_deletes %}
+                      <span class="badge text-bg-warning">Yes</span>
+                    {% else %}
+                      <span class="badge text-bg-secondary">No</span>
+                    {% endif %}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         {% endfor %}
-      </div>
-    </div>
-
-    <!-- Desktop table -->
-    <div class="d-none d-md-block">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table align-middle mb-0">
-              <thead>
-                <tr>
-                  <th scope="col" class="text-secondary">Source</th>
-                  <th scope="col" class="text-secondary">Schedule</th>
-                  <th scope="col" class="text-secondary" style="width: 150px;">Enabled</th>
-                  <th scope="col" class="text-secondary" style="width: 190px;">Sync deletes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for src in sources %}
-                  <tr>
-                    <td>
-                      <div class="mono wrap-anywhere">{{ src.content_path }}</div>
-                      <div class="small wrap-anywhere mt-1">
-                        {% if src.url %}
-                          <a href="{{ src.url }}" target="_blank" rel="noopener noreferrer">{{ src.url }}</a>
-                        {% else %}
-                          <span class="text-secondary">—</span>
-                        {% endif %}
-                      </div>
-                    </td>
-                    <td class="mono wrap-anywhere">{{ src.download_schedule }}</td>
-                    <td>
-                      {% if src.download_enabled %}
-                        <span class="badge text-bg-success">Enabled</span>
-                      {% else %}
-                        <span class="badge text-bg-secondary">Disabled</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if src.sync_remote_deletes %}
-                        <span class="badge text-bg-warning">Yes</span>
-                      {% else %}
-                        <span class="badge text-bg-light text-secondary border">No</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
   {% else %}
