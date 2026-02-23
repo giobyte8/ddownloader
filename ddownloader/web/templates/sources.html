@@ -56,7 +56,10 @@
                 </div>
               </td>
 
-              <td class="font-monospace">{{ src.download_schedule }}</td>
+              <td>
+                <div>{{ src.human_readable_schedule() }}</div>
+                <div class="small font-monospace">{{ src.download_schedule }}</div>
+              </td>
 
               <td>
                 <table>
@@ -113,7 +116,8 @@
                 <!-- Schedule -->
                 <div class="col-12 pt-3">
                   <div class="small text-secondary">Download schedule</div>
-                  <div class="font-monospace">{{ src.download_schedule }}</div>
+                  <div>{{ src.human_readable_schedule() }}</div>
+                  <div class="small font-monospace">{{ src.download_schedule }}</div>
                 </div>
 
 

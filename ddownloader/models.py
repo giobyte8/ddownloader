@@ -1,3 +1,4 @@
+from cron_descriptor import get_description
 from enum import Enum
 from pydantic import BaseModel, HttpUrl
 from uuid import UUID, uuid4
@@ -18,6 +19,9 @@ class HttpGallerySource(HttpSource):
     sync_remote_deletes: bool
     download_schedule: str
     download_enabled: bool
+
+    def human_readable_schedule(self) -> str:
+        return get_description(self.download_schedule)
 
 
 class SrcItemRemoteStatus(Enum):
