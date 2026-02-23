@@ -33,13 +33,14 @@ async def cleanup():
         await _aiohttp_session.close()
 
 
-async def notify(msg: str) -> None:
+async def notify(msg: str, format: str = 'text') -> None:
     """Posts a notification to Central
 
     Args:
         msg (str): Notification content
+        format (str): Notification format "text" | "markdown" (default: 'text')
     """
-    req_body = { "title": "ddownloader", "content": msg }
+    req_body = { "title": "ddownloader", "content": msg, "format": format }
 
     try:
         async with _http().post(_NOTIF_URL, json=req_body) as res:

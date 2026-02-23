@@ -88,6 +88,9 @@ def ct_api_url():
 def ct_api_key():
     return os.getenv("CT_API_KEY")
 
+def app_base_url():
+    return os.getenv("APP_BASE_URL", "http://localhost:5002")
+
 
 def otel_svc_name():
     return os.getenv("OTEL_SERVICE_NAME", "ddownloader")

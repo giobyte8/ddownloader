@@ -121,8 +121,8 @@ async def page(
             started_at=db_job.started_at,
             completed_at=db_job.completed_at,
             source=source,
-            downloaded_files_count=int(getattr(db_job, "downloaded_files_count", 0) or 0),
-            skipped_files_count=int(getattr(db_job, "skipped_files_count", 0) or 0),
+            downloaded_files_count=db_job.downloaded_files_count,
+            skipped_files_count=db_job.skipped_files_count,
         ))
 
     return jobs
@@ -130,9 +130,17 @@ async def page(
 
 @tracer.start_as_current_span("download_job_dao.find_by_id")
 async def find_by_id(job_id: UUID) -> GallerySrcDownloadJob | None:
-    db_job = await DBGallerySrcDownloadJob\
-        .get_or_none(id=job_id)\
+    db_job = await (
+        DBGallerySrcDownloadJob
+        .filter(id=job_id)
+        .annotate(
+            downloaded_files_count=Count("downloaded_files", distinct=True),
+            skipped_files_count=Count("skipped_files", distinct=True),
+        )
+        .group_by("id")
         .prefetch_related("source")
+        .first()
+    )
     if db_job is None:
         return None
 
@@ -153,6 +161,8 @@ async def find_by_id(job_id: UUID) -> GallerySrcDownloadJob | None:
         started_at=db_job.started_at,
         completed_at=db_job.completed_at,
         source=source,
+        downloaded_files_count=db_job.downloaded_files_count,
+        skipped_files_count=db_job.skipped_files_count,
     )
 
 
