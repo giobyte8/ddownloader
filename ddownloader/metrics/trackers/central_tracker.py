@@ -9,7 +9,7 @@ from .base import EventTracker
 
 
 log = logging.getLogger(__name__)
-_DL_FILES_BASE_URL = f"{ cfg.app_base_url() }/sources/download-jobs"
+_DL_FILES_BASE_URL = f"{ cfg.app_base_url() }/sources/download_jobs"
 
 
 class CentralEventTracker(EventTracker):
