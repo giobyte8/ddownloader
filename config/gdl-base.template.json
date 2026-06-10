@@ -32,6 +32,7 @@
         },
 
         "instagram": {
+            "filename": "ig_{username}_{media_id}.{extension}",
             "cookies": {
                 "sessionid": "<Replace with your own value>"
             }
