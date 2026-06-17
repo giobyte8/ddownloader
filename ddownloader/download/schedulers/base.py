@@ -11,6 +11,13 @@ class Scheduler(metaclass=ABCMeta):
     """
 
     @abstractmethod
+    async def immediate(self, src: HttpSource):
+        """Schedules a given source to be downloaded immediately,
+        without any delay or periodicity.
+        """
+        pass
+
+    @abstractmethod
     async def schedule(self, src: HttpSource):
         """Schedules a given source for periodic download
         """

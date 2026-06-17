@@ -34,8 +34,30 @@ class AIOGalleryDlScheduler(Scheduler):
 
         return SQLAlchemyJobStore(url=store_url)
 
+    async def immediate(self, src: HttpGallerySource):
+        """Schedules a given source to be downloaded immediately,
+        without any delay or periodicity.
+        """
+        if not isinstance(src, HttpGallerySource):
+            raise TypeError("src must be an instance of HttpGallerySource")
+        log.debug("src: %s - Scheduling for immediate download", src.id)
+
+        # Omit 'trigger' argument to execute the job immediately.
+        self._scheduler.add_job(
+            gl_downloader.download,
+            id=f"immediate-{ src.id }",
+
+            # Args for the 'gl_downloader.download' function.
+            args=[src],
+            replace_existing=True,
+        )
+
     async def schedule(self, src: HttpGallerySource):
-        """Schedules a given source for periodic download
+        """Schedules a given source for periodic download based on its
+        `download_schedule` attribute. \
+
+        If a job with the same id already exists, it will be replaced with
+        the new one. This prevents jobs duplication across application runs.
         """
         if not isinstance(src, HttpGallerySource):
             raise TypeError("src must be an instance of HttpGallerySource")
@@ -47,6 +69,10 @@ class AIOGalleryDlScheduler(Scheduler):
             gl_downloader.download,
             CronTrigger.from_crontab(src.download_schedule),
             id=str(src.id),
+
+            # The old job with same id will be replaced with new one.
+            #  This guarantees the job doesn't get duplicated across
+            #  application runs or if same source is scheduled multiple times.
             replace_existing=True,
             args=[src],
 

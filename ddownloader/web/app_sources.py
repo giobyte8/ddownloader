@@ -1,4 +1,4 @@
-from quart import Blueprint, render_template, request, abort
+from quart import Blueprint, render_template, request, abort, current_app as app
 from uuid import UUID
 from ddownloader.dao import http_gallery_source_dao as src_dao
 from ddownloader.dao import gallery_src_download_job_dao as job_dao
@@ -10,6 +10,18 @@ sources_app = Blueprint("sources", __name__)
 async def all():
     sources = await src_dao.all()
     return await render_template("sources.html", sources=sources)
+
+@sources_app.route("/<uuid:src_id>/download_jobs", methods=["POST"])
+async def download_immediately(src_id: UUID):
+    src = await src_dao.find_by_id(src_id)
+    if not src:
+        abort(404, description="Source not found")
+
+    # Schedule the source for immediate download
+    await app.src_download_scheduler.immediate(src)
+
+    return {"message": "Download job scheduled successfully."}, 200
+
 
 @sources_app.route("/download_jobs", methods=["GET"])
 async def download_jobs():
