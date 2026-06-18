@@ -99,10 +99,15 @@
                     <span>Past downloads</span>
                   </a>
 
-                  <button class="btn btn-sm btn-secondary">
-                    <i class="bi bi-cloud-download-fill me-1"></i>
-                    <span>Download now</span>
-                  </button>
+                  <form action="{{ url_for('sources.download_immediately', src_id=src.id) }}"
+                        method="post"
+                        class="d-inline"
+                        onsubmit="this.querySelector('button[type=submit]').disabled=true">
+                    <button class="btn btn-sm btn-secondary" type="submit">
+                      <i class="bi bi-cloud-download-fill me-1"></i>
+                      <span>Download now</span>
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

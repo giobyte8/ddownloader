@@ -1,4 +1,4 @@
-from quart import Blueprint, render_template, request, abort, current_app as app
+from quart import Blueprint, render_template, request, abort, redirect, url_for, current_app as app
 from uuid import UUID
 from ddownloader.dao import http_gallery_source_dao as src_dao
 from ddownloader.dao import gallery_src_download_job_dao as job_dao
@@ -20,7 +20,7 @@ async def download_immediately(src_id: UUID):
     # Schedule the source for immediate download
     await app.src_download_scheduler.immediate(src)
 
-    return {"message": "Download job scheduled successfully."}, 200
+    return redirect(url_for("sources.download_jobs", source_id=src_id))
 
 
 @sources_app.route("/download_jobs", methods=["GET"])
