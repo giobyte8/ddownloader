@@ -1,6 +1,7 @@
 from cron_descriptor import get_description
 from enum import Enum
 from pydantic import BaseModel, HttpUrl
+from pathlib import Path
 from uuid import UUID, uuid4
 from datetime import datetime
 
@@ -20,7 +21,34 @@ class HttpGallerySource(HttpSource):
     download_schedule: str
     download_enabled: bool
 
-    def human_readable_schedule(self) -> str:
+    @property
+    def name(self) -> str:
+        """Returns a human-readable name for the source,
+        derived from the last segment of `content_path`.
+        """
+        path = self.content_path or ""
+        if not path:
+            return ""
+
+        # Use pathlib to get the last path segment (OS-native semantics).
+        last = Path(path).name
+
+        # Replace separators '-' and '_' with spaces and trim whitespace.
+        name = last.replace("-", " ").replace("_", " ").strip()
+        if not name:
+            # If replacing delimiters yields only empty/space, return the
+            # original last segment instead of an empty string.
+            return last
+
+        # If all alphabetic characters are lowercase, capitalize the result.
+        letters = [c for c in name if c.isalpha()]
+        if letters and all(c.islower() for c in letters):
+            name = name.capitalize()
+
+        return name
+
+    @property
+    def download_schedule_description(self) -> str:
         return get_description(self.download_schedule)
 
 

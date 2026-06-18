@@ -60,6 +60,9 @@ if __name__ == "__main__":
         log.info("Running quart app on: %s:%s", host, port)
         asyncio.run(serve(downloader_app, hypercorn_cfg))
     else:
+        downloader_app.jinja_env.auto_reload = True
+        #downloader_app.config["TEMPLATES_AUTO_RELOAD"] = True
+
         downloader_app.run(
             host=host,
             port=port

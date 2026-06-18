@@ -6,7 +6,7 @@
   <header class="mb-2 mb-sm-4">
     <div class="row">
       <div class="col-12 col-sm-6">
-        <h1 class="h3 mb-1">Http Gallery Sources</h1>
+        <h1 class="h3 mb-1">Gallery Sources</h1>
       </div>
 
       <div class="col-12 col-sm-6 text-sm-end pt-sm-1">
@@ -18,136 +18,100 @@
 
   {% if sources and (sources|length) > 0 %}
 
-    <!-- Desktop table -->
-    <div class="table-responsive d-none d-lg-block">
-      <table class="table table-striped align-middle mb-0 small">
-        <thead>
-          <tr>
-            <th scope="col">🔗 Source</th>
-            <th scope="col">📅 Schedule</th>
-            <th scope="col">⚙️ Config</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for src in sources %}
-            <tr>
-              <td>
-                <div class="font-monospace">
-                  {{ src.content_path }}
-                </div>
-                <a
-                  class="text-decoration-none"
-                  href="{{ src.url }}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ src.url }}
-                </a>
+    <!-- Universal/Responsive card based grid -->
+    <div class="row">
+      {% for src in sources %}
+        <div class="col-12 col-lg-6 mb-3">
 
-                <div class="pt-2 text-secondary small">
-                  <table>
-                    <tr>
-                      <td>Source id:</td>
-                      <td class="ps-2">
-                        <span>{{ src.id }}</span>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </td>
-
-              <td>
-                <div>{{ src.human_readable_schedule() }}</div>
-                <div class="small font-monospace">{{ src.download_schedule }}</div>
-              </td>
-
-              <td>
-                <table>
-                  <tr>
-                    <td class="text-end">Enabled:</td>
-                    <td class="ps-2">
-                      {% if src.download_enabled %}
-                        <span class="badge text-bg-success">Yes</span>
-                      {% else %}
-                        <span class="badge text-bg-secondary">No</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="pt-2 text-end">Sync deletes:</td>
-                    <td class="pt-2 ps-2">
-                      {% if src.sync_remote_deletes %}
-                        <span class="badge text-bg-warning">Yes</span>
-                      {% else %}
-                        <span class="badge text-bg-secondary">No</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Mobile-friendly cards -->
-    <div class="d-lg-none">
-      <div class="d-flex flex-column gap-2">
-        {% for src in sources %}
-          <div class="card shadow-sm small">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">{{ src.name }}</h5>
+            </div>
             <div class="card-body pb-4">
-              <div class="row">
+              <div class="card-text">
 
-                <!-- Header area: content path + url (no labels) -->
-                <div class="col-12">
-                  <div class="font-monospace">{{ src.content_path }}</div>
-                  <a
-                    class="text-decoration-none"
-                    href="{{ src.url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                <p class="text-truncate mb-1">
+                  <i class="bi bi-link me-1"></i>
+                  <a class="text-reset" href="{{ src.url }}" target="_blank">
                     {{ src.url }}
                   </a>
-                </div>
+                </p>
 
-                <!-- Schedule -->
-                <div class="col-12 pt-3">
-                  <div class="small text-secondary">Download schedule</div>
-                  <div>{{ src.human_readable_schedule() }}</div>
-                  <div class="small font-monospace">{{ src.download_schedule }}</div>
-                </div>
+                <p class="text-truncate mb-0">
+                  <i class="bi bi-folder me-1"></i>
+                  <span class="font-monospace bg-secondary-subtle p-1">
+                    {{ src.content_path }}
+                  </span>
+                </p>
 
+                <div class="row mt-4">
+                  <div class="col-6">
+                    <label>
+                      <!-- <i class="bi bi-calendar-event me-1"></i> -->
+                      <b class="text-secondary small">SCHEDULE</b>
+                    </label>
+                    <p class="mb-0">
+                      <span class="font-monospace bg-secondary-subtle px-1">
+                        {{ src.download_schedule }}
+                      </span>
+                      <br/>
+                      <i class="small">{{ src.download_schedule_description }}</i>
+                    </p>
+                  </div>
 
-                <div class="pt-2 col-6">
-                  <div class="small text-secondary">Download enabled</div>
-                  <div>
-                    {% if src.download_enabled %}
-                      <span class="badge text-bg-success">Enabled</span>
-                    {% else %}
-                      <span class="badge text-bg-secondary">Disabled</span>
-                    {% endif %}
+                  <div class="col-6">
+                    <label>
+                      <!-- <i class="bi bi-calendar-event me-1"></i> -->
+                      <b class="text-secondary small">OPTIONS</b>
+                    </label>
+
+                    <!-- Download enabled -->
+                    <p class="mb-0">
+                      {% if src.download_enabled %}
+                        <i class="bi bi-toggle2-on me-1"></i>
+                      {% else %}
+                        <i class="bi bi-toggle2-off me-1"></i>
+                      {% endif %}
+                      <span>Download enabled</span>
+                    </p>
+
+                    <!-- Sync remote deletes enabled -->
+                    <p class="mb-0">
+                      {% if src.sync_remote_deletes %}
+                        <i class="bi bi-toggle2-on me-1"></i>
+                      {% else %}
+                        <i class="bi bi-toggle2-off me-1"></i>
+                      {% endif %}
+                      <span>Sync remote deletes</span>
+                    </p>
                   </div>
                 </div>
 
-                <div class="pt-2 col-6">
-                  <div class="small text-secondary">Sync remote deletes</div>
-                  <div>
-                    {% if src.sync_remote_deletes %}
-                      <span class="badge text-bg-warning">Yes</span>
-                    {% else %}
-                      <span class="badge text-bg-secondary">No</span>
-                    {% endif %}
-                  </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div class="row">
+                <div class="col text-end">
+                  <a class="btn btn-sm btn-secondary me-2"
+                     href="{{ url_for('sources.download_jobs', source_id=src.id) }}">
+                    <i class="bi bi-list-check me-1"></i>
+                    <span>Past downloads</span>
+                  </a>
+
+                  <button class="btn btn-sm btn-secondary">
+                    <i class="bi bi-cloud-download-fill me-1"></i>
+                    <span>Download now</span>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        {% endfor %}
-      </div>
+
+        </div>
+      {% endfor %}
     </div>
+
   {% else %}
     <div class="alert alert-info" role="alert">
       No sources available.
