@@ -1,0 +1,88 @@
+
+<div class="row">
+  <div class="col-12 col-lg-5 col-xl-6 mb-3">
+    <p class="text-truncate mb-1">
+      <i class="bi bi-link me-1"></i>
+      <a class="text-reset" href="{{ job.source.url }}" target="_blank">
+        {{ job.source.url }}
+      </a>
+    </p>
+
+    <p class="text-truncate mb-0">
+      <i class="bi bi-folder me-1"></i>
+      <span class="font-monospace bg-secondary-subtle p-1">
+        {{ job.source.content_path }}
+      </span>
+    </p>
+  </div>
+
+  <!-- Started at -->
+  <div class="col-4 col-lg-3 col-xl-2">
+    <label>
+      <b class="text-secondary small">STARTED AT</b>
+    </label>
+    <p class="mb-0">
+
+      <time class="fm-datetime" datetime="{{ job.started_at.isoformat() }}">
+        {{ job.started_at }}
+      </time>
+      <br>
+      <time class="rel-time text-secondary fst-italic" datetime="{{ job.started_at.isoformat() }}">
+        {{ job.started_at }}
+      </time>
+    </p>
+  </div>
+
+  <!-- Completed at -->
+  <div class="col-4 col-lg-3 col-xl-2">
+    <label>
+      <b class="text-secondary small">COMPLETED AT</b>
+    </label>
+    <p class="mb-0">
+
+      {% if job.completed_at %}
+      <time class="fm-datetime" datetime="{{ job.completed_at.isoformat() }}">
+        {{ job.completed_at }}
+      </time>
+      <br />
+
+      <i class="text-secondary">Took:</i>
+      <span class="js-duration text-secondary fst-italic"
+        data-start="{{ job.started_at.isoformat() }}"
+        data-end="{{ job.completed_at.isoformat() }}">
+        {{ (job.completed_at - job.started_at) }}
+      </span>
+      {% else %}
+      <span>Not yet</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Files counters -->
+  <div class="col-4 col-lg-1 col-xl-2">
+    <label>
+      <b class="text-secondary small">FILES</b>
+    </label>
+
+    <!-- Downloaded -->
+    <p class="mb-0">
+      {% if job.downloaded_files_count %}
+      <a class="text-decoration-none text-success"
+        href="{{ url_for('sources.download_job_downloaded_files', job_id=job.id) }}">
+        <i class="bi bi-file-earmark-arrow-down me-1"></i>
+        <span>{{ job.downloaded_files_count }}</span>
+      </a>
+      {% else %}
+      <i class="bi bi-file-earmark-arrow-down me-1"></i>
+      <span>{{ job.downloaded_files_count }}</span>
+      {% endif %}
+    </p>
+
+    <!-- Skipped -->
+    <p class="mb-0 text-secondary fst-italic">
+      <i class="bi bi-skip-forward me-1"></i>
+      <span>{{ job.skipped_files_count }}</span>
+    </p>
+  </div>
+
+</div>

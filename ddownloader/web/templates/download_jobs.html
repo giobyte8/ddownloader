@@ -20,7 +20,7 @@
       {% endif %}
 
       <div class="col-12 col-sm-6 text-sm-end pt-sm-1">
-        <span class="badge text-bg-secondary">Showing xx - yy</span>
+        <span class="badge text-bg-secondary d-none">Showing xx - yy</span>
         <span class="badge text-bg-secondary">{{ total }} total</span>
       </div>
     </div>
@@ -42,299 +42,40 @@
     <div class="alert alert-info" role="alert">No download jobs available.</div>
   {% else %}
 
-    <div class="table-responsive d-none d-lg-block">
-      <table class="table table-striped align-middle mb-0 small">
-        <thead>
-          <tr>
-            <th scope="col">🔗 Job & Source</th>
-            <th scope="col">🔢 Counts</th>
-            <th scope="col">⏱️ Timing</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for job in jobs %}
-            <tr>
-              <td>
-                <div class="font-monospace">
-                  {{ job.source.content_path }}
-                </div>
-                <a
-                  class="text-decoration-none"
-                  href="{{ job.source.url }}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ job.source.url }}
-                </a>
+    <!-- Download jobs list -->
+    <div class="row">
+      {% for job in jobs %}
+      <div class="col-12">
 
-                <div class="pt-2 text-secondary small">
-                  <table>
-                    <tr>
-                      <td>Job id:</td>
-                      <td class="ps-2">{{ job.id }}</td>
-                    </tr>
-                    <tr>
-                      <td>Source id:</td>
-                      <td class="ps-2">
-                        <a
-                          class="text-reset"
-                          href="?source_id={{ job.source.id }}"
-                        >
-                          {{ job.source.id }}
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </td>
+        <div class="card mb-3">
+          <div class="
+            card-header d-flex justify-content-between align-items-center
+            {% if job.downloaded_files_count %} bg-success-subtle {% endif %}
+            "
+          >
+            <h5 class="card-title mb-0">{{ job.source.name }}</h5>
 
-              <td class="" style="width: 10rem;">
-                <table>
-                  <tr>
-                    <td class="text-secondary text-end">Downloaded files:</td>
-                    <td class="ps-2">
-                      {% if job.downloaded_files_count > 0 %}
-                        <a
-                          href="/sources/download_jobs/{{ job.id }}/downloaded_files"
-                        >
-                          {{ job.downloaded_files_count }}
-                        </a>
-                      {% else %}
-                        {{ job.downloaded_files_count }}
-                      {% endif %}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="text-secondary text-end">Skipped files:</td>
-                    <td class="ps-2">{{ job.skipped_files_count }}</td>
-                  </tr>
-                </table>
-              </td>
+            <a href="{{ url_for('sources.download_job_downloaded_files', job_id=job.id) }}"
+              class="btn btn-sm btn-outline-secondary fst-italic"
+            >
+              <span>Ran</span>
+              <time
+                class="rel-time"
+                datetime="{{ job.started_at.isoformat() }}">
+                {{ job.started_at }}
+              </time>
 
-              <td>
-                <table>
-                  <tr>
-                    <td class="text-secondary text-end align-top">
-                      Started:
-                    </td>
-                    <td class="ps-2">
-                      {% if job.started_at %}
-                        <time
-                          class="rel-time"
-                          datetime="{{ job.started_at.isoformat() }}"
-                        >
-                          {{ job.started_at }}
-                        </time>
-                        <br>
-                        <time
-                          class="fm-datetime small text-secondary"
-                          datetime="{{ job.started_at.isoformat() }}"
-                        >
-                          {{ job.started_at }}
-                        </time>
-                      {% else %}
-                        <span class="text-secondary">—</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="text-secondary text-end align-top">
-                      Completed:
-                    </td>
-                    <td class="ps-2">
-                      {% if job.completed_at %}
-                        <time
-                          class="rel-time"
-                          datetime="{{ job.completed_at.isoformat() }}"
-                        >
-                          {{ job.completed_at }}
-                        </time>
-                        <br>
-                        <time
-                          class="fm-datetime small text-secondary"
-                          datetime="{{ job.completed_at.isoformat() }}"
-                        >
-                          {{ job.completed_at }}
-                        </time>
-                      {% else %}
-                        <span class="text-secondary">Not yet</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="text-secondary text-end align-top">
-                      Duration:
-                    </td>
-                    <td class="ps-2">
-                      {% if job.started_at and job.completed_at %}
-                        <span
-                          class="js-duration"
-                          data-start="{{ job.started_at.isoformat() }}"
-                          data-end="{{ job.completed_at.isoformat() }}"
-                        >
-                          {{ (job.completed_at - job.started_at) }}
-                        </span>
-                      {% else %}
-                        <span class="text-secondary">—</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Render cards for small screens -->
-    <div class="d-lg-none">
-      <div class="d-flex flex-column gap-2">
-        {% for job in jobs %}
-          <div class="card shadow-sm small">
-            <div class="card-body">
-              <div class="row">
-
-                <!-- Content path and Url-->
-                <div class="col-12">
-                  <div class="font-monospace">{{ job.source.content_path }}</div>
-                  <a
-                    class="text-decoration-none"
-                    href="{{ job.source.url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {{ job.source.url }}
-                  </a>
-                </div>
-
-                <!-- Job id & Source -->
-                <div class="col-12 pt-2 pt-sm-3 text-secondary small">
-                  <table>
-                    <tr>
-                      <td>Job id:</td>
-                      <td class="ps-2">{{ job.id }}</td>
-                    </tr>
-                    <tr>
-                      <td>Source id:</td>
-                      <td class="ps-2">
-                        <a
-                          class="text-reset"
-                          href="?source_id={{ job.source.id }}"
-                        >
-                          {{ job.source.id }}
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-
-                <!-- Counts on sm and larger screens -->
-                <div class="pt-2 pt-sm-3 col-4 col-sm-6">
-                  <table>
-                    <tr>
-                      <td class="text-secondary text-end">
-                        <span class="d-sm-none">Downloaded:</span>
-                        <span class="d-none d-sm-inline">Downloaded files:</span>
-                      </td>
-                      <td class="ps-sm-2">
-                        {% if job.downloaded_files_count > 0 %}
-                          <a
-                            href="/sources/download_jobs/{{ job.id }}/downloaded_files"
-                          >
-                            {{ job.downloaded_files_count }}
-                          </a>
-                        {% else %}
-                          {{ job.downloaded_files_count }}
-                        {% endif %}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-secondary text-end">
-                        <span class="d-sm-none">Skipped:</span>
-                        <span class="d-none d-sm-inline">Skipped files:</span>
-                      </td>
-                      <td class="ps-sm-2">{{ job.skipped_files_count }}</td>
-                    </tr>
-                  </table>
-                </div>
-
-                <!-- Timing -->
-                <div class="pt-2 pt-sm-3 col-8 col-sm-6">
-                  <table>
-                    <tr>
-                      <td class="text-secondary text-end align-top">
-                        Started:
-                      </td>
-                      <td class="ps-1 ps-sm-2">
-                        <time
-                          class="rel-time"
-                          datetime="{{ job.started_at.isoformat() }}"
-                        >
-                          {{ job.started_at }}
-                        </time>
-                        <br>
-                        <time
-                          class="fm-datetime small text-secondary"
-                          datetime="{{ job.started_at.isoformat() }}"
-                        >
-                          {{ job.started_at }}
-                        </time>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="text-secondary text-end align-top">
-                        Completed:
-                      </td>
-                      <td class="ps-1 ps-sm-2">
-                        {% if job.completed_at %}
-                          <time
-                            class="rel-time"
-                            datetime="{{ job.completed_at.isoformat() }}"
-                          >
-                            {{ job.completed_at }}
-                          </time>
-                          <br>
-                          <time
-                            class="fm-datetime small text-secondary"
-                            datetime="{{ job.completed_at.isoformat() }}"
-                          >
-                            {{ job.completed_at }}
-                          </time>
-                        {% else %}
-                          <span class="text-secondary">Not yet</span>
-                        {% endif %}
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="text-secondary text-end align-top">
-                        Duration:
-                      </td>
-                      <td class="ps-1 ps-sm-2">
-                        {% if job.started_at and job.completed_at %}
-                          <span
-                            class="js-duration"
-                            data-start="{{ job.started_at.isoformat() }}"
-                            data-end="{{ job.completed_at.isoformat() }}"
-                          >
-                            {{ (job.completed_at - job.started_at) }}
-                          </span>
-                        {% else %}
-                          <span class="text-secondary">—</span>
-                        {% endif %}
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
+              <i class="bi bi-chevron-double-right ms-1"></i>
+            </a>
           </div>
-        {% endfor %}
+
+          <div class="card-body">
+            {% include 'fragments/dl_job_body.html' %}
+          </div>
+        </div>
+
       </div>
+      {% endfor %}
     </div>
 
     {% set base_path = '/sources/download_jobs' %}

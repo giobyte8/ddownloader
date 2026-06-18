@@ -3,207 +3,49 @@
 {% block title %}Downloaded files{% endblock %}
 
 {% block content %}
-  <header class="mb-2 mb-sm-3 align-middle">
-    <div class="row">
-      <div class="col-12 col-sm-6">
-        <h1 class="h3 mb-1">Downloaded files</h1>
-      </div>
-
-      <div class="col-12 col-sm-6 text-sm-end pt-sm-1">
-        <span class="badge text-bg-secondary">{{ total }} total</span>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-12">
-        <p class="text-secondary mb-0">
-          <a class="text-decoration-none" href="/sources/download_jobs">
-            ⬅ Back to Download Jobs
-          </a>
-        </p>
-      </div>
-    </div>
+  <header class="mb-3">
+    <h1 class="mb-0">Download Job</h1>
+    <h3 class="text-secondary">{{ job.source.name }}</h3>
   </header>
 
   <!-- Job details -->
-  <div class="card shadow-sm small mb-3">
+  <div class="card">
     <div class="card-body">
-      <div class="row">
-
-        <div class="col-12 col-md-7 col-lg-6">
-          <div class="text-secondary mb-2 mb-md-3">
-            <span>Job id:</span>
-            <span>{{ job.id }}</span>
-          </div>
-
-          <div class="font-monospace">
-            {{ job.source.content_path }}
-          </div>
-          <a
-            class="text-decoration-none"
-            href="{{ job.source.url }}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {{ job.source.url }}
-          </a>
-        </div>
-
-        <div class="col-6 col-md-5 col-lg-6 pt-2 pt-md-0">
-          <table>
-            <tr>
-              <td class="text-secondary text-end align-top">
-                <span class="d-none d-md-inline">Started:</span>
-                <span class="d-md-none">Start:</span>
-              </td>
-              <td class="ps-2">
-                <time class="rel-time" datetime="{{ job.started_at.isoformat() }}">
-                  {{ job.started_at }}
-                </time>
-                <br>
-                <time
-                  class="fm-datetime small text-secondary"
-                  datetime="{{ job.started_at.isoformat() }}"
-                >
-                  {{ job.started_at }}
-                </time>
-              </td>
-            </tr>
-            <tr class="d-none d-md-table-row">
-              <td class="text-secondary text-end align-top">Completed:</td>
-              <td class="ps-2">
-                {% if job.completed_at %}
-                  <time class="rel-time" datetime="{{ job.completed_at.isoformat() }}">
-                    {{ job.completed_at }}
-                  </time>
-                  <br>
-                  <time
-                    class="fm-datetime small text-secondary"
-                    datetime="{{ job.completed_at.isoformat() }}"
-                  >
-                    {{ job.completed_at }}
-                  </time>
-                {% else %}
-                  <span class="text-secondary">Not yet</span>
-                {% endif %}
-              </td>
-            </tr>
-            <tr>
-              <td class="text-secondary text-end align-top">
-                <span class="d-none d-md-inline">Duration:</span>
-                <span class="d-md-none">⏱️:</span>
-              </td>
-              <td class="ps-2">
-                {% if job.started_at and job.completed_at %}
-                  <span
-                    class="js-duration"
-                    data-start="{{ job.started_at.isoformat() }}"
-                    data-end="{{ job.completed_at.isoformat() }}"
-                  >
-                    {{ (job.completed_at - job.started_at) }}
-                  </span>
-                {% else %}
-                  <span class="text-secondary">—</span>
-                {% endif %}
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="col-6 d-md-none pt-2">
-          <table>
-            <tr class="">
-              <td class="text-secondary text-end align-top">
-                <span class="d-none d-md-inline">Completed:</span>
-                <span class="d-md-none">End:</span>
-              </td>
-              <td class="ps-2">
-                {% if job.completed_at %}
-                  <time class="rel-time" datetime="{{ job.completed_at.isoformat() }}">
-                    {{ job.completed_at }}
-                  </time>
-                  <br>
-                  <time
-                    class="fm-datetime small text-secondary"
-                    datetime="{{ job.completed_at.isoformat() }}"
-                  >
-                    {{ job.completed_at }}
-                  </time>
-                {% else %}
-                  <span class="text-secondary">Not yet</span>
-                {% endif %}
-              </td>
-          </table>
-        </div>
-      </div>
+      {% include 'fragments/dl_job_body.html' %}
     </div>
   </div>
+
+  <h2 class="mt-4">Downloaded files ({{ total }})</h2>
+  <hr class="mt-2"/>
 
   {% if not files or (files|length) == 0 %}
     <div class="alert alert-info" role="alert">No downloaded files available.</div>
   {% else %}
-    <!-- Downloaded files on large screens -->
-    <div class="table-responsive d-none d-lg-block">
-      <table class="table table-striped align-middle mb-0 small">
-        <thead>
-          <tr>
-            <th scope="col">📄 Filename</th>
-            <th scope="col">⏱️ Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for f in files %}
-            <tr>
-              <td class="wrap-anywhere">
-                <span class="mono">{{ f.src_item.filename if f.src_item else f.src_item_id }}</span>
-              </td>
-              <td>
-                {% if f.created_at %}
-                  <time class="rel-time" datetime="{{ f.created_at.isoformat() }}">{{ f.created_at }}</time>
-                  <br>
-                  <time class="fm-datetime small text-secondary" datetime="{{ f.created_at.isoformat() }}">{{ f.created_at }}</time>
-                {% else %}
-                  <span class="text-secondary">—</span>
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
 
-    <!-- Downloaded files on small screens -->
-    <div class="d-lg-none">
-      <div class="d-flex flex-column gap-2">
-        {% for f in files %}
-          <div class="card shadow-sm small">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-12 col-sm-8">
-                  <div class="text-secondary">Filename</div>
-                  <div class="font-monospace">
-                    {{ f.src_item.filename }}
+    <!-- Downloaded files -->
+    <div class="row">
+      {% for f in files %}
+        <div class="col-12 col-md-6 col-lg-4">
+
+          <div class="card mb-3">
+            <div class="row g-0">
+
+              <!-- Card content -->
+              <div class="col-12">
+                <div class="card-body">
+                  <div class="card-text text-truncate align-middle">
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+                    <span>{{ f.src_item.filename }}</span>
                   </div>
                 </div>
-
-                <div class="col-12 col-sm-4 pt-2 pt-sm-0">
-                  <div class="text-secondary">Created</div>
-                    <time class="rel-time" datetime="{{ f.created_at.isoformat() }}">
-                      {{ f.created_at }}
-                    </time>
-                    <br>
-                    <time
-                      class="fm-datetime small text-secondary"
-                      datetime="{{ f.created_at.isoformat() }}"
-                    >
-                      {{ f.created_at }}
-                    </time>
-                </div>
               </div>
+
+              <!-- Preview -->
+              <div class="col-4 d-none"></div>
             </div>
           </div>
-        {% endfor %}
-      </div>
+        </div>
+      {% endfor %}
     </div>
 
     {% set base_path = '/sources/download_jobs/' ~ job_id ~ '/downloaded_files' %}
