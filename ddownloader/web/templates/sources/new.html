@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}New Source{% endblock %}
+
+{% block content %}
+  <header class="mb-2 mb-sm-4">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1 class="h3 mb-1">New Gallery Source</h1>
+      </div>
+    </div>
+  </header>
+
+  <div class="row">
+    <div class="col-12 col-lg-8 col-xl-6">
+
+      <form action="{{ url_for('sources.create_source') }}" method="post" novalidate>
+
+        <!-- URL -->
+        <div class="mb-3">
+          <label for="url" class="form-label fw-semibold">URL</label>
+          <input
+            type="url"
+            class="form-control{% if errors.url %} is-invalid{% endif %}"
+            id="url"
+            name="url"
+            value="{{ form.url or '' }}"
+            placeholder="https://example.com/gallery"
+            required
+          />
+          {% if errors.url %}
+            <div class="invalid-feedback">{{ errors.url }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Content path -->
+        <div class="mb-3">
+          <label for="content_path" class="form-label fw-semibold">Content path</label>
+          <div class="input-group{% if errors.content_path %} has-validation{% endif %}">
+            <span class="input-group-text font-monospace text-secondary small">
+              {{ galleries_path or '/galleries' }}
+            </span>
+            <input
+              type="text"
+              class="form-control font-monospace{% if errors.content_path %} is-invalid{% endif %}"
+              id="content_path"
+              name="content_path"
+              value="{{ form.content_path or '' }}"
+              placeholder="portraits/artist-name"
+              required
+            />
+            {% if errors.content_path %}
+              <div class="invalid-feedback">{{ errors.content_path }}</div>
+            {% endif %}
+          </div>
+          <div class="form-text">Relative path inside the galleries directory.</div>
+        </div>
+
+        <!-- Download schedule -->
+        <div class="mb-4">
+          <label for="download_schedule" class="form-label fw-semibold">Download schedule</label>
+          <input
+            type="text"
+            class="form-control font-monospace{% if errors.download_schedule %} is-invalid{% endif %}"
+            id="download_schedule"
+            name="download_schedule"
+            value="{{ form.download_schedule or '0 0 * * SUN' }}"
+            placeholder="0 0 * * SUN"
+            required
+          />
+          {% if errors.download_schedule %}
+            <div class="invalid-feedback">{{ errors.download_schedule }}</div>
+          {% endif %}
+          <div class="form-text">Standard 5-part cron expression (minute hour day month weekday).</div>
+        </div>
+
+        <!-- Options -->
+        <div class="mb-4">
+          <p class="form-label fw-semibold mb-2">Options</p>
+
+          <div class="form-check mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="download_enabled"
+              name="download_enabled"
+              {% if form.download_enabled == 'on' or form.download_enabled == True %}checked{% endif %}
+            />
+            <label class="form-check-label" for="download_enabled">
+              Download enabled
+            </label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="sync_remote_deletes"
+              name="sync_remote_deletes"
+              {% if form.sync_remote_deletes == 'on' or form.sync_remote_deletes == True %}checked{% endif %}
+            />
+            <label class="form-check-label" for="sync_remote_deletes">
+              Sync remote deletes
+            </label>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>
+            Create source
+          </button>
+          <a href="{{ url_for('sources.all') }}" class="btn btn-outline-secondary">
+            Cancel
+          </a>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

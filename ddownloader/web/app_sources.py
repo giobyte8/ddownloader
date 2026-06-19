@@ -1,8 +1,12 @@
 from quart import Blueprint, render_template, request, abort, redirect, url_for, current_app as app
+from pydantic import ValidationError
 from uuid import UUID
+from ddownloader import config as cfg
 from ddownloader.dao import http_gallery_source_dao as src_dao
 from ddownloader.dao import gallery_src_download_job_dao as job_dao
 from ddownloader.dao import download_job_downloaded_file_dao as downloaded_file_dao
+from ddownloader.models import HttpGallerySource
+from ddownloader.web.form_models import CreateSourceForm
 
 sources_app = Blueprint("sources", __name__)
 
@@ -10,6 +14,58 @@ sources_app = Blueprint("sources", __name__)
 async def all():
     sources = await src_dao.all()
     return await render_template("sources.html", sources=sources)
+
+
+@sources_app.route("/new", methods=["GET"])
+async def new_source():
+    return await render_template(
+        "sources/new.html",
+        errors={},
+        form={"download_schedule": "0 0 * * SUN"},
+        galleries_path=cfg.galleries_path(),
+    )
+
+
+@sources_app.route("/", methods=["POST"])
+async def create_source():
+    form = await request.form
+    errors = {}
+
+    # Stage 1: format / constraint validation (sync, Pydantic)
+    try:
+        data = CreateSourceForm.model_validate({
+            **form,
+            "sync_remote_deletes": "sync_remote_deletes" in form,
+            "download_enabled": "download_enabled" in form,
+        })
+    except ValidationError as e:
+        for err in e.errors():
+            field = err["loc"][0] if err["loc"] else "__all__"
+            if field not in errors:
+                errors[field] = err["msg"].removeprefix("Value error, ")
+
+    # Stage 2: DB-dependent validation (async) — only when format is clean
+    if not errors:
+        if await src_dao.exists_by_url(str(data.url)):
+            errors["url"] = "A source with this URL already exists"
+
+    if errors:
+        return await render_template(
+            "sources/new.html",
+            errors=errors,
+            form=form,
+            galleries_path=cfg.galleries_path(),
+        ), 422
+
+    source = HttpGallerySource(
+        url=data.url,
+        content_path=data.content_path,
+        sync_remote_deletes=data.sync_remote_deletes,
+        download_schedule=data.download_schedule,
+        download_enabled=data.download_enabled,
+    )
+    await src_dao.create(source)
+    return redirect(url_for("sources.all"))
 
 @sources_app.route("/<uuid:src_id>/download_jobs", methods=["POST"])
 async def download_immediately(src_id: UUID):

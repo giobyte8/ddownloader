@@ -10,13 +10,30 @@ from ddownloader import futils
 from ddownloader.models import HttpGallerySource
 
 
+log = logging.getLogger(__name__)
 trace = trace.get_tracer(cfg.otel_svc_name())
 
 
 @trace.start_as_current_span("gdl.download")
 async def download(download_job_id: UUID, src: HttpGallerySource) -> None:
+    try:
+        futils.assert_dir_exists(cfg.galleries_path())
+    except futils.DirNotFoundError:
+        log.error(f"Galleries root path does not exists: '{ cfg.galleries_path() }'")
+        return
+
     gl_content_path = os.path.join(cfg.galleries_path(), src.content_path)
-    futils.assert_dir_exists(gl_content_path)
+    try:
+        futils.assert_dir_exists(gl_content_path)
+    except futils.DirNotFoundError:
+        log.info(f"Content path '{ gl_content_path }' does not exist, creating it")
+        futils.mkdirs(gl_content_path)
+
+        try:
+            futils.assert_dir_exists(gl_content_path)
+        except futils.DirNotFoundError:
+            log.error(f"Unable to create content path: '{ gl_content_path }'")
+            return
 
     cmd_file_skipped = [
         'python',
