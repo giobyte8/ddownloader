@@ -13,7 +13,8 @@ class DBHttpGallerySource(Model):
 
     # Cron string defining the download schedule for this source,
     # e.g. "0 0 * * SUN" for weekly on Sundays at midnight.
-    download_schedule = fields.CharField(max_length=255)
+    # Nullable — a source without a schedule can only be downloaded manually.
+    download_schedule = fields.CharField(max_length=255, null=True, default=None)
 
     download_enabled = fields.BooleanField()
 

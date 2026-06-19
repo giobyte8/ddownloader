@@ -64,14 +64,13 @@
             class="form-control font-monospace{% if errors.download_schedule %} is-invalid{% endif %}"
             id="download_schedule"
             name="download_schedule"
-            value="{{ form.download_schedule or '0 0 * * SUN' }}"
+            value="{{ form.download_schedule or '' }}"
             placeholder="0 0 * * SUN"
-            required
           />
           {% if errors.download_schedule %}
             <div class="invalid-feedback">{{ errors.download_schedule }}</div>
           {% endif %}
-          <div class="form-text">Standard 5-part cron expression (minute hour day month weekday).</div>
+          <div class="form-text">Optional. Standard 5-part cron expression (minute hour day month weekday). Leave blank to disable scheduled downloads.</div>
         </div>
 
         <!-- Options -->

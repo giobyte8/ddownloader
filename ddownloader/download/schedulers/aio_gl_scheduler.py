@@ -62,6 +62,10 @@ class AIOGalleryDlScheduler(Scheduler):
         if not isinstance(src, HttpGallerySource):
             raise TypeError("src must be an instance of HttpGallerySource")
 
+        if not src.download_schedule:
+            log.warning("src: %s - No schedule defined, skipping", src.id)
+            return
+
         log.info("src: %s - Scheduling with crontab: %s", src.id, src.download_schedule)
 
         # See: https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#examples
@@ -86,6 +90,7 @@ class AIOGalleryDlScheduler(Scheduler):
         """Starts the scheduler in background.
         """
         if not self._scheduler.running:
+            log.debug("Starting Galleries download Scheduler...")
             self._scheduler.start()
         else:
-            log.warning("Gallery download Scheduler is already running")
+            log.warning("Galleries download Scheduler is already running")

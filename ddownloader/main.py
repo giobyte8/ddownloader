@@ -15,7 +15,6 @@ if not __package__ and not hasattr(sys, "frozen"):
 
 import ddownloader.config as cfg
 from ddownloader.dao import database
-from ddownloader.download import download_svc
 from ddownloader.download.schedulers.aio_gl_scheduler import (
     AIOGalleryDlScheduler
 )
@@ -35,7 +34,7 @@ async def before_serving():
 
     await database.init()
 
-    dl_task = asyncio.create_task(download_svc.start())
+    dl_task = asyncio.create_task(downloader_app.src_download_scheduler.start())
     __bg_tasks.add(dl_task)
 
 

@@ -54,11 +54,15 @@
                       <b class="text-secondary small">SCHEDULE</b>
                     </label>
                     <p class="mb-0">
-                      <span class="font-monospace bg-secondary-subtle px-1">
-                        {{ src.download_schedule }}
-                      </span>
-                      <br/>
-                      <i class="small">{{ src.download_schedule_description }}</i>
+                      {% if src.download_schedule %}
+                        <span class="font-monospace bg-secondary-subtle px-1">
+                          {{ src.download_schedule }}
+                        </span>
+                        <br/>
+                        <i class="small">{{ src.download_schedule_description }}</i>
+                      {% else %}
+                        <i class="text-secondary fst-italic">No schedule</i>
+                      {% endif %}
                     </p>
                   </div>
 

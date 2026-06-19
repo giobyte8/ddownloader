@@ -65,6 +65,10 @@ async def create_source():
         download_enabled=data.download_enabled,
     )
     await src_dao.create(source)
+
+    if source.download_enabled and source.download_schedule:
+        await app.src_download_scheduler.schedule(source)
+
     return redirect(url_for("sources.all"))
 
 @sources_app.route("/<uuid:src_id>/download_jobs", methods=["POST"])

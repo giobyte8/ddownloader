@@ -18,7 +18,7 @@ class HttpSingleFileSource(HttpSource):
 class HttpGallerySource(HttpSource):
     content_path: str
     sync_remote_deletes: bool
-    download_schedule: str
+    download_schedule: str | None = None
     download_enabled: bool
 
     @property
@@ -48,7 +48,9 @@ class HttpGallerySource(HttpSource):
         return name
 
     @property
-    def download_schedule_description(self) -> str:
+    def download_schedule_description(self) -> str | None:
+        if not self.download_schedule:
+            return None
         return get_description(self.download_schedule)
 
 
