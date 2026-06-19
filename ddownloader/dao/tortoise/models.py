@@ -10,7 +10,11 @@ class DBHttpGallerySource(Model):
     url = fields.CharField(max_length=5000)
     content_path = fields.CharField(max_length=5000)
     sync_remote_deletes = fields.BooleanField(default=True)
+
+    # Cron string defining the download schedule for this source,
+    # e.g. "0 0 * * SUN" for weekly on Sundays at midnight.
     download_schedule = fields.CharField(max_length=255)
+
     download_enabled = fields.BooleanField()
 
     class Meta:
