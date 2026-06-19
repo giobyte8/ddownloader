@@ -21,7 +21,7 @@ async def new_source():
     return await render_template(
         "sources/new.html",
         errors={},
-        form={"download_schedule": "0 0 * * SUN"},
+        form={},
         galleries_path=cfg.galleries_path(),
     )
 

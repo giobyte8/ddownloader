@@ -37,7 +37,7 @@
         <div class="mb-3">
           <label for="content_path" class="form-label fw-semibold">Content path</label>
           <div class="input-group{% if errors.content_path %} has-validation{% endif %}">
-            <span class="input-group-text font-monospace text-secondary small">
+            <span class="input-group-text font-monospace small">
               {{ galleries_path or '/galleries' }}
             </span>
             <input
@@ -70,7 +70,7 @@
           {% if errors.download_schedule %}
             <div class="invalid-feedback">{{ errors.download_schedule }}</div>
           {% endif %}
-          <div class="form-text">Optional. Standard 5-part cron expression (minute hour day month weekday). Leave blank to disable scheduled downloads.</div>
+          <div class="form-text">Optional. Standard 5-part cron expression (minute hour day month weekday).</div>
         </div>
 
         <!-- Options -->
