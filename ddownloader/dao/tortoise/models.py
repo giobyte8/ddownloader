@@ -1,3 +1,4 @@
+from datetime import datetime
 from tortoise.models import Model
 from tortoise import fields
 from ddownloader.models import SrcItemRemoteStatus
@@ -17,6 +18,10 @@ class DBHttpGallerySource(Model):
     download_schedule = fields.CharField(max_length=255, null=True, default=None)
 
     download_enabled = fields.BooleanField()
+
+    # Not persisted in database. Used to store aggregated value retrieved
+    # during queries that join with APScheduler jobs.
+    job_next_run_time: float | None
 
     class Meta:
         table = "http_gallery_source"
@@ -96,3 +101,13 @@ class DBDownloadJobSkippedFile(Model):
 
     class Meta:
         table = "download_job_skipped_file"
+
+
+class DBAPSchedulerJob(Model):
+    """Database Tortoise model for APScheduler jobs."""
+
+    id = fields.CharField(max_length=255, primary_key=True)
+    next_run_time = fields.FloatField(null=True)
+
+    class Meta:
+        table = "apscheduler_jobs"

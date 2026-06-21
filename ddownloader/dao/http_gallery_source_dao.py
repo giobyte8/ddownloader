@@ -1,7 +1,10 @@
 import logging
+from datetime import datetime
 from uuid import UUID, uuid4
+from tortoise.expressions import Subquery, RawSQL
+
 from ddownloader.models import HttpGallerySource
-from .tortoise.models import DBHttpGallerySource
+from .tortoise.models import DBHttpGallerySource, DBAPSchedulerJob
 
 
 logger = logging.getLogger(__name__)
@@ -62,12 +65,30 @@ async def all() -> list[HttpGallerySource]:
     Get all HTTP sources from the database.
 
     Returns:
-        list[DBHttpSource]: List of all HTTP sources.
+        list[HttpGallerySource]: List of all HTTP sources.
     """
-    db_sources = await DBHttpGallerySource.all()
+    db_sources = await DBHttpGallerySource\
+        .annotate(
+            job_next_run_time=Subquery(
+                DBAPSchedulerJob\
+                    .filter(id=RawSQL('http_gallery_source.id::text'))\
+                    .limit(1)\
+                    .values('next_run_time')
+            )
+        )\
+        .all()
 
     sources = []
     for db_src in db_sources:
+        next_run_time = None
+        if db_src.job_next_run_time:
+            try:
+                next_run_time = datetime.fromtimestamp(db_src.job_next_run_time)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to parse job_next_run_time for source {db_src.id}: {e}"
+                )
+
         sources.append(HttpGallerySource(
             id=db_src.id,
             url=db_src.url,
@@ -75,6 +96,7 @@ async def all() -> list[HttpGallerySource]:
             sync_remote_deletes=db_src.sync_remote_deletes,
             download_schedule=db_src.download_schedule,
             download_enabled=db_src.download_enabled,
+            job_next_run_time=next_run_time,
         ))
 
     return sources

@@ -21,6 +21,11 @@ class HttpGallerySource(HttpSource):
     download_schedule: str | None = None
     download_enabled: bool
 
+    # Run time for next scheduled download job, if any.
+    #  Timezone depends on how apscheduler store it.
+    #  By default it uses local timezone
+    job_next_run_time: datetime | None = None
+
     @property
     def name(self) -> str:
         """Returns a human-readable name for the source,

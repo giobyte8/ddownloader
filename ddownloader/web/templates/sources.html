@@ -30,7 +30,7 @@
             <div class="card-header">
               <h5 class="card-title mb-0">{{ src.name }}</h5>
             </div>
-            <div class="card-body pb-4">
+            <div class="card-body">
               <div class="card-text">
 
                 <p class="text-truncate mb-1">
@@ -47,8 +47,8 @@
                   </span>
                 </p>
 
-                <div class="row mt-4">
-                  <div class="col-6">
+                <div class="row mt-3">
+                  <div class="mb-2 col-6 col-sm-4 col-lg-6 col-xl-4">
                     <label>
                       <!-- <i class="bi bi-calendar-event me-1"></i> -->
                       <b class="text-secondary small">SCHEDULE</b>
@@ -66,7 +66,30 @@
                     </p>
                   </div>
 
-                  <div class="col-6">
+                  <div class="mb-2 col-6 col-sm-4 col-lg-6 col-xl-4">
+                    <label>
+                      <b class="text-secondary small">NEXT DOWNLOAD</b>
+                    </label>
+
+                    <p class="mb-0">
+                      {% if src.job_next_run_time %}
+                        <time class="fm-datetime" datetime="{{ src.job_next_run_time.isoformat() }}">
+                          {{ src.job_next_run_time }}
+                        </time>
+                        <br>
+                        <time
+                          class="rel-time text-secondary fst-italic"
+                          datetime="{{ src.job_next_run_time.isoformat() }}"
+                        >
+                          {{ src.job_next_run_time }}
+                        </time>
+                      {% else %}
+                        <span class="text-secondary">- - -</span>
+                      {% endif %}
+                    </p>
+                  </div>
+
+                  <div class="col-6 col-sm-4 col-lg-6 col-xl-4">
                     <label>
                       <!-- <i class="bi bi-calendar-event me-1"></i> -->
                       <b class="text-secondary small">OPTIONS</b>
@@ -79,7 +102,7 @@
                       {% else %}
                         <i class="bi bi-toggle2-off me-1"></i>
                       {% endif %}
-                      <span>Download enabled</span>
+                      <span>Download</span>
                     </p>
 
                     <!-- Sync remote deletes enabled -->
@@ -89,7 +112,7 @@
                       {% else %}
                         <i class="bi bi-toggle2-off me-1"></i>
                       {% endif %}
-                      <span>Sync remote deletes</span>
+                      <span>Remote deletes</span>
                     </p>
                   </div>
                 </div>
