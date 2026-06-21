@@ -69,13 +69,12 @@ psycopg-pool==3.2.6
 pycryptodomex==3.23.0
 pydantic==2.11.3
 pydantic_core==2.33.1
-pypika-tortoise==0.5.0
 python-dotenv==1.1.0
 pytz==2025.2
 Quart==0.20.0
 requests==2.32.3
 SQLAlchemy==2.0.41
-tortoise-orm==0.25.0
+tortoise-orm==1.1.7
 typing-inspection==0.4.0
 typing_extensions==4.13.2
 tzlocal==5.3.1

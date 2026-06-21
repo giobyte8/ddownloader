@@ -43,6 +43,7 @@ async def shutdown():
     for task in __bg_tasks:
         task.cancel()
 
+    await database.shutdown()
     await metrics_tracker.cleanup()
 
 
