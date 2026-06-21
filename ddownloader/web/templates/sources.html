@@ -101,6 +101,12 @@
               <div class="row">
                 <div class="col text-end">
                   <a class="btn btn-sm btn-secondary me-2"
+                     href="{{ url_for('sources.edit_source', src_id=src.id) }}">
+                    <i class="bi bi-pencil me-1"></i>
+                    <span>Edit</span>
+                  </a>
+
+                  <a class="btn btn-sm btn-secondary me-2"
                      href="{{ url_for('sources.download_jobs', source_id=src.id) }}">
                     <i class="bi bi-list-check me-1"></i>
                     <span>Past downloads</span>

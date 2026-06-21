@@ -1,5 +1,5 @@
 import logging
-from uuid import uuid4
+from uuid import UUID, uuid4
 from ddownloader.models import HttpGallerySource
 from .tortoise.models import DBHttpGallerySource
 
@@ -84,6 +84,10 @@ async def exists_by_url(url: str) -> bool:
     return await DBHttpGallerySource.filter(url=url).exists()
 
 
+async def exists_by_url_excluding(url: str, exclude_id: UUID) -> bool:
+    return await DBHttpGallerySource.filter(url=url).exclude(id=exclude_id).exists()
+
+
 async def create(source: HttpGallerySource) -> HttpGallerySource:
     db_src = await DBHttpGallerySource.create(
         id=uuid4(),
@@ -94,4 +98,15 @@ async def create(source: HttpGallerySource) -> HttpGallerySource:
         download_enabled=source.download_enabled,
     )
     source.id = db_src.id
+    return source
+
+
+async def update(source: HttpGallerySource) -> HttpGallerySource:
+    await DBHttpGallerySource.filter(id=source.id).update(
+        url=str(source.url),
+        content_path=source.content_path,
+        sync_remote_deletes=source.sync_remote_deletes,
+        download_schedule=source.download_schedule,
+        download_enabled=source.download_enabled,
+    )
     return source

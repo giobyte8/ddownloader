@@ -86,6 +86,17 @@ class AIOGalleryDlScheduler(Scheduler):
             jitter=60,
         )
 
+    async def unschedule(self, src: HttpGallerySource):
+        """Removes a source's scheduled job, if it exists.
+        Safe to call even if no job was ever registered.
+        """
+        from apscheduler.jobstores.base import JobLookupError
+        try:
+            self._scheduler.remove_job(str(src.id))
+            log.info("src: %s - Removed from schedule", src.id)
+        except JobLookupError:
+            pass
+
     async def start(self):
         """Starts the scheduler in background.
         """

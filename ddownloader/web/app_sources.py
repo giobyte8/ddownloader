@@ -6,9 +6,17 @@ from ddownloader.dao import http_gallery_source_dao as src_dao
 from ddownloader.dao import gallery_src_download_job_dao as job_dao
 from ddownloader.dao import download_job_downloaded_file_dao as downloaded_file_dao
 from ddownloader.models import HttpGallerySource
-from ddownloader.web.form_models import CreateSourceForm
+from ddownloader.web.form_models import SourceForm
 
 sources_app = Blueprint("sources", __name__)
+
+
+async def _sync_schedule(source: HttpGallerySource):
+    """Schedule or unschedule a source based on its current state."""
+    if source.download_enabled and source.download_schedule:
+        await app.src_download_scheduler.schedule(source)
+    else:
+        await app.src_download_scheduler.unschedule(source)
 
 @sources_app.route("/", methods=["GET"])
 async def all():
@@ -19,7 +27,10 @@ async def all():
 @sources_app.route("/new", methods=["GET"])
 async def new_source():
     return await render_template(
-        "sources/new.html",
+        "sources/form.html",
+        page_title="New Gallery Source",
+        action_url=url_for("sources.create_source"),
+        submit_label="Create source",
         errors={},
         form={},
         galleries_path=cfg.galleries_path(),
@@ -33,7 +44,7 @@ async def create_source():
 
     # Stage 1: format / constraint validation (sync, Pydantic)
     try:
-        data = CreateSourceForm.model_validate({
+        data = SourceForm.model_validate({
             **form,
             "sync_remote_deletes": "sync_remote_deletes" in form,
             "download_enabled": "download_enabled" in form,
@@ -51,7 +62,10 @@ async def create_source():
 
     if errors:
         return await render_template(
-            "sources/new.html",
+            "sources/form.html",
+            page_title="New Gallery Source",
+            action_url=url_for("sources.create_source"),
+            submit_label="Create source",
             errors=errors,
             form=form,
             galleries_path=cfg.galleries_path(),
@@ -65,10 +79,78 @@ async def create_source():
         download_enabled=data.download_enabled,
     )
     await src_dao.create(source)
+    await _sync_schedule(source)
+    return redirect(url_for("sources.all"))
 
-    if source.download_enabled and source.download_schedule:
-        await app.src_download_scheduler.schedule(source)
 
+@sources_app.route("/<uuid:src_id>/edit", methods=["GET"])
+async def edit_source(src_id: UUID):
+    src = await src_dao.find_by_id(src_id)
+    if not src:
+        abort(404, description="Source not found")
+
+    return await render_template(
+        "sources/form.html",
+        page_title="Edit Source",
+        action_url=url_for("sources.update_source", src_id=src_id),
+        submit_label="Save changes",
+        errors={},
+        form={
+            "url": str(src.url),
+            "content_path": src.content_path,
+            "download_schedule": src.download_schedule or "",
+            "download_enabled": src.download_enabled,
+            "sync_remote_deletes": src.sync_remote_deletes,
+        },
+        galleries_path=cfg.galleries_path(),
+    )
+
+
+@sources_app.route("/<uuid:src_id>", methods=["POST"])
+async def update_source(src_id: UUID):
+    src = await src_dao.find_by_id(src_id)
+    if not src:
+        abort(404, description="Source not found")
+
+    form = await request.form
+    errors = {}
+
+    # Stage 1: format / constraint validation (sync, Pydantic)
+    try:
+        data = SourceForm.model_validate({
+            **form,
+            "sync_remote_deletes": "sync_remote_deletes" in form,
+            "download_enabled": "download_enabled" in form,
+        })
+    except ValidationError as e:
+        for err in e.errors():
+            field = err["loc"][0] if err["loc"] else "__all__"
+            if field not in errors:
+                errors[field] = err["msg"].removeprefix("Value error, ")
+
+    # Stage 2: DB-dependent validation — URL unique excluding self
+    if not errors:
+        if await src_dao.exists_by_url_excluding(str(data.url), exclude_id=src_id):
+            errors["url"] = "A source with this URL already exists"
+
+    if errors:
+        return await render_template(
+            "sources/form.html",
+            page_title="Edit Source",
+            action_url=url_for("sources.update_source", src_id=src_id),
+            submit_label="Save changes",
+            errors=errors,
+            form=form,
+            galleries_path=cfg.galleries_path(),
+        ), 422
+
+    src.url = data.url
+    src.content_path = data.content_path
+    src.sync_remote_deletes = data.sync_remote_deletes
+    src.download_schedule = data.download_schedule
+    src.download_enabled = data.download_enabled
+    await src_dao.update(src)
+    await _sync_schedule(src)
     return redirect(url_for("sources.all"))
 
 @sources_app.route("/<uuid:src_id>/download_jobs", methods=["POST"])

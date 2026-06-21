@@ -3,7 +3,7 @@ from apscheduler.triggers.cron import CronTrigger
 from pydantic import BaseModel, HttpUrl, field_validator
 
 
-class CreateSourceForm(BaseModel):
+class SourceForm(BaseModel):
     url: HttpUrl
     content_path: str
     download_schedule: str | None = None
