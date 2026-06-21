@@ -60,9 +60,15 @@ if __name__ == "__main__":
         log.info("Running quart app on: %s:%s", host, port)
         asyncio.run(serve(downloader_app, hypercorn_cfg))
     else:
-        downloader_app.jinja_env.auto_reload = True
-        #downloader_app.config["TEMPLATES_AUTO_RELOAD"] = True
+        """`downloader_app.run` hardcodes hypercorn log config under the hood,
+        seems we can't edit it as in prod mode. \
 
+        Consider switching to asyncio.run(serve(...)) in dev mode as well, with
+        `hypercorn_cfg.use_reloader = True` config to enable reload and keeping
+        `downloader_app.jinja_env.auto_reload = True` to auto reload templates.
+        """
+
+        downloader_app.jinja_env.auto_reload = True
         downloader_app.run(
             host=host,
             port=port
