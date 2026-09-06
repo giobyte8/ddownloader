@@ -20,6 +20,7 @@ from ddownloader.download.schedulers.aio_gl_scheduler import (
 )
 from ddownloader.metrics import tracker as metrics_tracker
 from ddownloader.web.app import app as downloader_app
+from ddownloader.web.auth import ensure_web_auth_configured
 
 
 log        = logging.getLogger("ddownloader")
@@ -29,6 +30,8 @@ __bg_tasks = set()
 
 @downloader_app.before_serving
 async def before_serving():
+    ensure_web_auth_configured()
+
     # Init shared resources
     downloader_app.src_download_scheduler = AIOGalleryDlScheduler()
 
