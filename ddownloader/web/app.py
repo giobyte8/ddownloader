@@ -3,7 +3,7 @@ from datetime import timedelta
 from quart import Quart
 from ddownloader import config as cfg
 from .auth.app import auth_app
-from .api_hooks import hooks_api
+from .api.hooks import hooks_api
 from .directories.app import directories_app
 from .sources.app import sources_app
 

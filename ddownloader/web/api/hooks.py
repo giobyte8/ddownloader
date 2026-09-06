@@ -4,7 +4,7 @@ from ddownloader.metrics.events import SrcDownloadEvent
 from ddownloader.metrics.tracker import event_hub
 from ddownloader.models import HttpGallerySourceItem, SrcItemRemoteStatus
 from ddownloader.dao import http_gl_src_item_dao as src_item_dao
-from .security import api_key_hooks_required
+from ..auth.security import api_key_hooks_required
 
 
 hooks_api = Blueprint("hooks", __name__)
