@@ -77,6 +77,22 @@ def api_key_hooks():
     return os.getenv("API_KEY_HOOKS")
 
 
+def secret_key():
+    return os.getenv("SECRET_KEY")
+
+
+def web_auth_username():
+    return os.getenv("WEB_AUTH_USERNAME")
+
+
+def web_auth_password_hash():
+    return os.getenv("WEB_AUTH_PASSWORD_HASH")
+
+
+def session_lifetime_days():
+    return int(os.getenv("SESSION_LIFETIME_DAYS", "7"))
+
+
 def ct_monitoring_enabled():
     return os.getenv("CT_MONITORING_ENABLED", "false").lower() == "true"
 

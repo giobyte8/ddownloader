@@ -7,8 +7,10 @@ from ddownloader.dao import gallery_src_download_job_dao as job_dao
 from ddownloader.dao import download_job_downloaded_file_dao as downloaded_file_dao
 from ddownloader.models import HttpGallerySource
 from ddownloader.web.form_models import SourceForm
+from ddownloader.web.auth import require_login
 
 sources_app = Blueprint("sources", __name__)
+sources_app.before_request(require_login)
 
 
 async def _sync_schedule(source: HttpGallerySource):
