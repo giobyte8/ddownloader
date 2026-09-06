@@ -6,6 +6,39 @@ from uuid import UUID, uuid4
 from datetime import datetime
 
 
+def _path_to_human(path: str) -> str:
+    """Takes a file system path and formats its last segment to make it
+    human friendly by: \
+        1. Taking the last segment of the path \
+        2. Replacing '-' and '_' with spaces \
+        3. Capitalizing if all letters are lowercase
+
+    Args:
+        path (str): File system path to format
+
+    Returns:
+        str: Human friendly representation
+    """
+    if not path:
+        return ""
+
+    # Use pathlib to get the last path segment (OS-native semantics).
+    last_segment = Path(path).name
+
+    # Replace separators '-' and '_' with spaces and trim whitespace.
+    name = last_segment.replace("-", " ").replace("_", " ").strip()
+    if not name:
+        # If replacing delimiters yields only empty/space, return the
+        # original last segment instead of an empty string.
+        return last_segment
+
+    # If all alphabetic characters are lowercase, capitalize the result.
+    letters = [c for c in name if c.isalpha()]
+    if letters and all(c.islower() for c in letters):
+        name = name.capitalize()
+
+    return name
+
 class HttpSource(BaseModel):
     id: UUID = uuid4()
     url: HttpUrl
@@ -31,26 +64,7 @@ class HttpGallerySource(HttpSource):
         """Returns a human-readable name for the source,
         derived from the last segment of `content_path`.
         """
-        path = self.content_path or ""
-        if not path:
-            return ""
-
-        # Use pathlib to get the last path segment (OS-native semantics).
-        last = Path(path).name
-
-        # Replace separators '-' and '_' with spaces and trim whitespace.
-        name = last.replace("-", " ").replace("_", " ").strip()
-        if not name:
-            # If replacing delimiters yields only empty/space, return the
-            # original last segment instead of an empty string.
-            return last
-
-        # If all alphabetic characters are lowercase, capitalize the result.
-        letters = [c for c in name if c.isalpha()]
-        if letters and all(c.islower() for c in letters):
-            name = name.capitalize()
-
-        return name
+        return _path_to_human(self.content_path)
 
     @property
     def download_schedule_description(self) -> str | None:
@@ -97,3 +111,17 @@ class DownloadJobSkippedFile(BaseModel):
     job_id: UUID
     src_item_id: UUID
     created_at: datetime | None = None
+
+class Directory(BaseModel):
+    """A DTO representing a directory holding media galleries content
+    and the sources that feed content into it.
+    """
+    path: str
+    sources: list[HttpGallerySource] = []
+
+    @property
+    def name(self) -> str:
+        """Computes a human-readable representation of this directory,
+        derived from the last segment of its `path`.
+        """
+        return _path_to_human(self.path)

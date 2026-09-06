@@ -60,14 +60,14 @@ async def find_by_download_enabled(enabled: bool) -> list[HttpGallerySource]:
     return sources
 
 
-async def all() -> list[HttpGallerySource]:
+async def all(order_by: str | None = None) -> list[HttpGallerySource]:
     """
     Get all HTTP sources from the database.
 
     Returns:
         list[HttpGallerySource]: List of all HTTP sources.
     """
-    db_sources = await DBHttpGallerySource\
+    query = DBHttpGallerySource\
         .annotate(
             job_next_run_time=Subquery(
                 DBAPSchedulerJob\
@@ -75,9 +75,12 @@ async def all() -> list[HttpGallerySource]:
                     .limit(1)\
                     .values('next_run_time')
             )
-        )\
-        .all()
+        )
 
+    if order_by:
+        query = query.order_by(order_by)
+
+    db_sources = await query.all()
     sources = []
     for db_src in db_sources:
         next_run_time = None
