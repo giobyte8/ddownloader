@@ -7,7 +7,7 @@ from quart import (
     session,
     url_for,
 )
-from .auth import SESSION_KEY, verify_credentials
+from .security import SESSION_KEY, verify_credentials
 
 auth_app = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)

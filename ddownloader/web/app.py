@@ -2,10 +2,10 @@ import logging
 from datetime import timedelta
 from quart import Quart
 from ddownloader import config as cfg
-from .auth_app import auth_app
+from .auth.app import auth_app
 from .api_hooks import hooks_api
-from .app_sources import sources_app
 from .directories.app import directories_app
+from .sources.app import sources_app
 
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,8 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 
 app.register_blueprint(auth_app)
 app.register_blueprint(hooks_api, url_prefix="/api/hooks")
-app.register_blueprint(sources_app, url_prefix="/sources")
 app.register_blueprint(directories_app, url_prefix="/directories")
+app.register_blueprint(sources_app, url_prefix="/sources")
 
 
 @app.route("/ping")
