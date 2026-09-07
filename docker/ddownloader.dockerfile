@@ -11,5 +11,5 @@ COPY requirements.txt /opt/ddownloader/requirements.txt
 
 
 # Install dependencies and run app
-RUN apk add --no-cache tzdata && pip install -r requirements.txt
+RUN apk add --no-cache tzdata ffmpeg && pip install -r requirements.txt
 ENTRYPOINT ["/bin/sh",  "otelw.sh"]
