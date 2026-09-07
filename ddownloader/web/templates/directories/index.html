@@ -13,105 +13,100 @@
 
   <div class="row">
     {% for dir in directories %}
-      <div class="col-12 mb-3">
+    <div class="col-12 mb-3">
 
-        <div class="card">
-          <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <div>
-              <h5 class="card-title mb-1">{{ dir.name }}</h5>
-              <span class="font-monospace bg-secondary-subtle p-1">
-                <i class="bi bi-folder"></i>
-                {{ dir.path }}
-              </span>
-            </div>
-
-            <button class="btn btn-sm btn-outline-dark"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#sources-{{ dir.path|replace('/', '-') }}">
-              <i class="bi bi-caret-down-fill"></i>
-              Sources
-            </button>
+      <div class="card">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title mb-1">{{ dir.name }}</h5>
+            <span class="font-monospace bg-secondary-subtle p-1">
+              <i class="bi bi-folder"></i>
+              {{ dir.path }}
+            </span>
           </div>
 
-          <div class="collapse" id="sources-{{ dir.path|replace('/', '-') }}">
-            <div class="card-body">
-              <div class="card-text">
+          <button class="btn btn-sm btn-outline-secondary"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sources-{{ dir.path|replace('/', '-') }}">
+            <i class="bi bi-caret-down-fill"></i>
+            Sources
+          </button>
+        </div>
 
-                <!-- Directory sources -->
-                {% for src in dir.sources %}
-                <div class="row {% if not loop.last %}pb-3 border-bottom{% endif %}">
+        <div class="collapse" id="sources-{{ dir.path|replace('/', '-') }}">
+          <div class="card-body py-0">
+            <div class="card-text">
 
-                  <!-- URL -->
-                  <div class="col-12 col-lg-6 col-xl-7 mb-2 mb-lg-0">
-                    <a class="text-reset" href="{{ src.url }}" target="_blank">
-                      {{ src.url }}
-                    </a>
-                  </div>
+              <!-- Directory sources -->
+              {% for src in dir.sources %}
+              <div class="row py-3 {% if not loop.last %} border-bottom{% endif %}">
 
-                  <!-- Schedule -->
-                  <div class="col-5 col-md-4 col-lg-2">
-                    {% if src.download_schedule %}
-                      <i class="bi bi-calendar-week"></i>
-                      <span>&nbsp;{{ src.download_schedule_description }}</span>
-
-                      <br/>
-                      <span class="font-monospace bg-secondary-subtle px-1 small">
-                        {{ src.download_schedule }}
-                      </span>
-                    {% else %}
-                      <i class="text-secondary fst-italic">No schedule</i>
-                    {% endif %}
-                  </div>
-
-                  <!-- Next Download -->
-                  <div class="col-5 col-md-4 col-lg-2">
-                    <i class="bi bi-save2"></i>
-                    <span>&nbsp;</span>
-                    {% if src.job_next_run_time %}
-                      <time
-                        class="rel-time"
-                        datetime="{{ src.job_next_run_time.isoformat() }}"
-                      >
-                        {{ src.job_next_run_time }}
-                      </time>
-
-                      <br>
-                      <time
-                        class="fm-datetime text-secondary fst-italic"
-                        datetime="{{ src.job_next_run_time.isoformat() }}"
-                      >
-                        {{ src.job_next_run_time }}
-                      </time>
-                    {% else %}
-                      <span>Next download</span><br>
-                      <span class="text-secondary">- - -</span>
-                    {% endif %}
-                  </div>
-
-                  <!-- Actions -->
-                  <div class="col-2 col-md-4 col-lg-2 col-xl-1 pt-1 text-end">
-
-                    <!-- Download now -->
-                    <form action="{{ url_for('sources.download_immediately', src_id=src.id) }}"
-                          method="post"
-                          class="d-inline"
-                          onsubmit="this.querySelector('button[type=submit]').disabled=true">
-                      <button class="btn btn-sm btn-dark" type="submit">
-                        <i class="bi bi-save2-fill"></i>
-                        <span class="d-none d-md-inline ms-1">Now</span>
-                      </button>
-                    </form>
-                  </div>
+                <!-- URL -->
+                <div class="col-12 col-lg-6 col-xl-7 mb-2 mb-lg-0">
+                  <a class="text-reset" href="{{ src.url }}" target="_blank">
+                    {{ src.url }}
+                  </a>
                 </div>
 
-                {% endfor %}
+                <div class="col-10 col-lg-4">
 
+                  <!-- Schedule -->
+                  {% if src.download_schedule %}
+                    <i class="bi bi-calendar-week"></i>
+                    <span>&nbsp;{{ src.download_schedule_description }}</span>
+                  {% else %}
+                    <i class="text-secondary fst-italic">No schedule</i>
+                  {% endif %}
+
+                  <!-- Next download -->
+                  <br>
+                  <i class="bi bi-save2"></i>
+                  <span>&nbsp;</span>
+                  {% if src.job_next_run_time %}
+                    <time
+                      class="rel-time"
+                      datetime="{{ src.job_next_run_time.isoformat() }}"
+                    >
+                      {{ src.job_next_run_time }}
+                    </time>
+
+                    <span class="mx-1">|</span>
+                    <time
+                      class="fm-datetime text-secondary fst-italic"
+                      datetime="{{ src.job_next_run_time.isoformat() }}"
+                    >
+                      {{ src.job_next_run_time }}
+                    </time>
+                  {% else %}
+                    <span>Next download</span><br>
+                    <span class="text-secondary">- - -</span>
+                  {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="col-2 col-lg-2 col-xl-1 pt-1 text-end">
+
+                  <!-- Download now -->
+                  <form action="{{ url_for('sources.download_immediately', src_id=src.id) }}"
+                        method="post"
+                        class="d-inline"
+                        onsubmit="this.querySelector('button[type=submit]').disabled=true">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">
+                      <i class="bi bi-save2-fill"></i>
+                      <span class="d-none d-md-inline ms-1">Now</span>
+                    </button>
+                  </form>
+                </div>
               </div>
+
+              {% endfor %}
+
             </div>
           </div>
         </div>
       </div>
+    </div>
     {% endfor %}
   </div>
 
