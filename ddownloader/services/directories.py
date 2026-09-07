@@ -5,7 +5,7 @@ from ..models import Directory
 async def all() -> list[Directory]:
     dirs = []
 
-    sources = await src_dao.all()
+    sources = await src_dao.all(order_by='content_path')
     current_dir = None
     for src in sources:
         if not current_dir or current_dir.path != src.content_path:
